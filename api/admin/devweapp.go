@@ -174,9 +174,9 @@ type personalDomainType struct {
 // wxa_server_domain	string	否	最多可以添加1000个服务器域名，以;隔开。注意：域名不需带有http:// 等协议内容，也不能在域名末尾附加详细的 URI 地址，严格按照类似 www.qq.com 的写法。
 // is_modify_published_together	boolean	否	是否同时修改“全网发布版本的值”。（false：只改“测试版”；true：同时改“测试版”和“全网发布版”）省略时，默认为false。
 type platformDomainReq struct {
-	Action          string   `json:"action" binding:"required" wx:"action"`
-	WxaServerDomain []string `json:"wxa_server_domain" wx:"wxa_server_domain"`
-	IsModify        bool     `json:"is_modify_published_together" wx:"is_modify_published_together"`
+	Action          string `json:"action" binding:"required" wx:"action"`
+	WxaServerDomain string `json:"wxa_server_domain" wx:"wxa_server_domain"`
+	IsModify        bool   `json:"is_modify_published_together" wx:"is_modify_published_together"`
 }
 
 // published_wxa_server_domain	string	目前生效的 “全网发布版”第三方平台“小程序服务器域名”。如果修改失败，该字段不会返回。如果没有已发布的第三方平台，该字段也不会返回。
