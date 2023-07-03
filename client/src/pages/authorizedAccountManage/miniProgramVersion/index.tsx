@@ -259,6 +259,7 @@ export default function MiniProgramVersion() {
         const resp = await request({
             request: getCurrentDomainRequest,
             data: {
+                appid: appId,
                 action: "get",
                 requestdomain: [],
                 wsrequestdomain: [],
