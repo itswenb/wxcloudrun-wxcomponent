@@ -627,7 +627,7 @@ func modifyThirdPlatformHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	}
-	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/component/modify_wxa_server_domain", "", req)
+	_, body, err := wx.PostWxJsonWithComponentKeyAccessToken("/cgi-bin/component/modify_wxa_server_domain", "", req)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
