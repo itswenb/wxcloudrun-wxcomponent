@@ -160,7 +160,15 @@ type categoryList struct {
 	CategoryList []category `json:"categoryList" wx:"category_list"`
 }
 
-type personalDomainType struct {
+// 属性	类型	必填	说明
+// action	string	是	操作类型
+// requestdomain	array<string>	是	request 合法域名；当 action 是 get 时不需要此字段
+// wsrequestdomain	array<string>	是	socket 合法域名；当 action 是 get 时不需要此字段
+// uploaddomain	array<string>	是	uploadFile 合法域名；当 action 是 get 时不需要此字段
+// downloaddomain	array<string>	是	downloadFile 合法域名；当 action 是 get 时不需要此字段
+// udpdomain	array<string>	是	udp 合法域名；当 action 是 get 时不需要此字段
+// tcpdomain	array<string>	是	tcp 合法域名；当 action 是 get 时不需要此字段
+type personalDomainReq struct {
 	Action          string   `json:"action" binding:"required" wx:"action"`
 	RequestDomain   []string `json:"requestdomain" wx:"requestdomain"`
 	WsRequestDomain []string `json:"wsrequestdomain" wx:"wsrequestdomain"`
@@ -168,6 +176,39 @@ type personalDomainType struct {
 	DownloadDomain  []string `json:"downloaddomain" wx:"downloaddomain"`
 	UdpDomain       []string `json:"udpdomain" wx:"udpdomain"`
 	TcpDomain       []string `json:"tcpdomain" wx:"tcpdomain"`
+}
+
+// errcode	number	返回码
+// errmsg	string	错误信息
+// requestdomain	array<string>	request 合法域名
+// wsrequestdomain	array<string>	socket 合法域名
+// uploaddomain	array<string>	uploadFile 合法域名
+// downloaddomain	array<string>	downloadFile 合法域名
+// udpdomain	array<string>	udp 合法域名
+// tcpdomain	array<string>	tcp 合法域名
+// invalid_requestdomain	array<string>	request 不合法域名
+// invalid_wsrequestdomain	array<string>	socket 不合法域名
+// invalid_uploaddomain	array<string>	uploadFile 不合法域名
+// invalid_downloaddomain	array<string>	downloadFile 不合法域名
+// invalid_udpdomain	array<string>	udp 不合法域名
+// invalid_tcpdomain	array<string>	tcp 不合法域名
+// no_icp_domain	array<string>	没有经过icp备案的域名
+type personalDomainResp struct {
+	ErrorCode              int      `json:"errcode" wx:"errcode"`
+	ErrorMessage           string   `json:"errmsg" wx:"errmsg"`
+	RequestDomain          []string `json:"requestdomain" wx:"requestdomain"`
+	WsRequestDomain        []string `json:"wsrequestdomain" wx:"wsrequestdomain"`
+	UploadDomain           []string `json:"uploaddomain" wx:"uploaddomain"`
+	DownloadDomain         []string `json:"downloaddomain" wx:"downloaddomain"`
+	UdpDomain              []string `json:"udpdomain" wx:"udpdomain"`
+	TcpDomain              []string `json:"tcpdomain" wx:"tcpdomain"`
+	InvalidRequestDomain   []string `json:"invalid_requestdomain" wx:"invalid_requestdomain"`
+	InvalidWsRequestDomain []string `json:"invalid_wsrequestdomain" wx:"invalid_wsrequestdomain"`
+	InvalidUploadDomain    []string `json:"invalid_uploaddomain" wx:"invalid_uploaddomain"`
+	InvalidDownloadDomain  []string `json:"invalid_downloaddomain" wx:"invalid_downloaddomain"`
+	InvalidUdpDomain       []string `json:"invalid_udpdomain" wx:"invalid_udpdomain"`
+	InvalidTcpDomain       []string `json:"invalid_tcpdomain" wx:"invalid_tcpdomain"`
+	NoIcpDomain            []string `json:"no_icp_domain" wx:"no_icp_domain"`
 }
 
 // action	string	是	操作类型。可选值请看下文
@@ -600,7 +641,7 @@ func getQRCodeHandler(c *gin.Context) {
 
 func modifyDomainHandler(c *gin.Context) {
 	appid := c.DefaultQuery("appid", "")
-	var req personalDomainType
+	var req personalDomainReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
@@ -612,7 +653,7 @@ func modifyDomainHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
-	var resp personalDomainType
+	var resp personalDomainResp
 	if err := wx.WxJson.Unmarshal(body, &resp); err != nil {
 		log.Errorf("Unmarshal err, %v", err)
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
