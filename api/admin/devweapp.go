@@ -183,6 +183,8 @@ type platformDomainReq struct {
 // testing_wxa_server_domain	string	目前生效的 “测试版”第三方平台“小程序服务器域名”。如果修改失败，该字段不会返回
 // invalid_wxa_server_domain	string	未通过验证的域名。如果不存在未通过验证的域名，该字段不会返回。
 type platformDomainResp struct {
+	ErrorCode                int    `json:"errcode" wx:"errcode"`
+	ErrorMessage             string `json:"errmsg" wx:"errmsg"`
 	PublishedWxaServerDomain string `json:"published_wxa_server_domain" wx:"published_wxa_server_domain"`
 	TestingWxaServerDomain   string `json:"testing_wxa_server_domain" wx:"testing_wxa_server_domain"`
 	InvalidWxaServerDomain   string `json:"invalid_wxa_server_domain" wx:"invalid_wxa_server_domain"`
@@ -640,7 +642,7 @@ func modifyThirdPlatformHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
-	var resp platformDomainReq
+	var resp platformDomainResp
 	if err := wx.WxJson.Unmarshal(body, &resp); err != nil {
 		log.Errorf("Unmarshal err, %v", err)
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
