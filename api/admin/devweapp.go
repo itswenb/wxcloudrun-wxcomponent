@@ -160,6 +160,19 @@ type categoryList struct {
 	CategoryList []category `json:"categoryList" wx:"category_list"`
 }
 
+type domainList struct {
+	RequestDomain   []string `json:"requestdomain"`
+	WsRequestDomain []string `json:"wsrequestdomain"`
+	UploadDomain    []string `json:"uploaddomain"`
+	DownloadDomain  []string `json:"downloaddomain"`
+	UdpDomain       []string `json:"udpdomain"`
+	TcpDomain       []string `json:"tcpdomain"`
+}
+type syncDomainReq struct {
+	Action        string     `json:"action"`
+	WebViewDomain domainList `json:"webviewdomain"`
+}
+
 func submitAudit(appid string, req *submitAuditReq) (int, error) {
 	_, body, err := wx.PostWxJsonWithAuthToken(appid, "/wxa/submit_audit", "", *req)
 	if err != nil {
@@ -566,4 +579,24 @@ func getQRCodeHandler(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, errno.OK.WithData(gin.H{"releaseQrCode": base64Image}))
+}
+
+func modifyDomainHandler(c *gin.Context) {
+	appid := c.DefaultQuery("appid", "")
+	var req syncDomainReq
+	// 如果action是set，webviewdomain字段必填, 如果是get，webviewdomain字段不填
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
+		return
+	}
+	if _, _, err := wx.PostWxJsonWithAuthToken(appid, "/wxa/modify_domain", "", gin.H{
+		"action":        req.Action,
+		"webviewdomain": req.WebViewDomain,
+	}); err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, errno.OK)
 }

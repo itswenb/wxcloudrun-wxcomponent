@@ -48,6 +48,7 @@ func Routers(e *gin.RouterGroup) {
 	g.GET("/page-list", getPageListHandler)
 	g.GET("/category", getCategoryHandler)
 	g.GET("/qrcode", getQRCodeHandler)
+	g.POST("/modify-domain", modifyDomainHandler)
 
 	// 设置
 	g.POST("/secret", setWxSecretHandler)
