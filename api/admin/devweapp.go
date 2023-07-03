@@ -160,17 +160,14 @@ type categoryList struct {
 	CategoryList []category `json:"categoryList" wx:"category_list"`
 }
 
-type domainList struct {
+type syncDomainReq struct {
+	Action          string   `json:"action"`
 	RequestDomain   []string `json:"requestdomain"`
 	WsRequestDomain []string `json:"wsrequestdomain"`
 	UploadDomain    []string `json:"uploaddomain"`
 	DownloadDomain  []string `json:"downloaddomain"`
 	UdpDomain       []string `json:"udpdomain"`
 	TcpDomain       []string `json:"tcpdomain"`
-}
-type syncDomainReq struct {
-	Action        string     `json:"action"`
-	WebViewDomain domainList `json:"webviewdomain"`
 }
 
 func submitAudit(appid string, req *submitAuditReq) (int, error) {
@@ -590,10 +587,7 @@ func modifyDomainHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	}
-	if _, _, err := wx.PostWxJsonWithAuthToken(appid, "/wxa/modify_domain", "", gin.H{
-		"action":        req.Action,
-		"webviewdomain": req.WebViewDomain,
-	}); err != nil {
+	if _, _, err := wx.PostWxJsonWithAuthToken(appid, "/wxa/modify_domain", "", req); err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
