@@ -18,13 +18,14 @@ import { truncate } from "lodash";
 import { request } from "../../../utils/axios";
 import {
     commitCodeRequest,
-    serverDomainRequest,
+    miniProgramDomainRequest,
     getDevVersionRequest,
     getTemplateListRequest,
     releaseCodeRequest,
     revokeAuditRequest,
     rollbackReleaseRequest,
     speedUpAuditRequest,
+    platformDomainRequest,
 } from "../../../utils/apis";
 import { useSearchParams } from "react-router-dom";
 import moment from "moment";
@@ -81,6 +82,10 @@ export default function MiniProgramVersion() {
     const [loading, setLoading] = useState(true);
     const [templateList, setTemplateList] = useState<ITemplateList>([]);
     const [searchParams] = useSearchParams();
+    const [currentMiniProgramDomain, setCurrentMiniProgramDomain] = useState<
+        any[] | undefined
+    >();
+    const [currentPlatformDomain, setCurrentPlatformDomain] = useState<any>();
 
     const formRef = useRef() as any;
 
@@ -131,22 +136,26 @@ export default function MiniProgramVersion() {
     const experienceOptions = useMemo(() => {
         const arr = [
             {
-                content: "获取当前服务器域名",
+                content: "获取小程序服务器域名",
                 value: 1,
             },
             {
-                content: "同步三方平台服务器域名",
+                content: "获取三方平台服务器域名",
                 value: 2,
             },
             {
-                content: "重新提交代码",
+                content: "同步三方域名至小程序",
                 value: 3,
+            },
+            {
+                content: "重新提交代码",
+                value: 4,
             },
         ];
         if (versionData.auditInfo?.status !== 2) {
             arr.push({
                 content: "提交审核",
-                value: 4,
+                value: 5,
             });
         }
         return arr;
@@ -229,6 +238,8 @@ export default function MiniProgramVersion() {
 
     // 这个组件这里的interface定义的不好
     const onClickExpOptions = (option: any) => {
+        console.log("onCLick option", option);
+
         const { value } = option;
         switch (value) {
             case 1: {
@@ -236,17 +247,22 @@ export default function MiniProgramVersion() {
                 getCurrentDomain();
                 break;
             }
-            case 1: {
+            case 2: {
                 // 同步服务器域名
-                syncDomain();
+                getPlatformDomain();
                 break;
             }
             case 3: {
+                // 同步服务器域名
+                syncDomainToMiniProgram();
+                break;
+            }
+            case 4: {
                 // 重新提交代码
                 setVisibleSubmitModal(true);
                 break;
             }
-            case 4: {
+            case 5: {
                 // 提交审核
                 window.location.href = `#${routes.submitAudit.path}?appId=${appId}`;
                 break;
@@ -254,46 +270,65 @@ export default function MiniProgramVersion() {
         }
     };
 
-    const [currentDomain, setCurrentDomain] = useState<any[] | undefined>();
-
     const getCurrentDomain = async () => {
         setLoading(true);
-        const resp = await request({
+        const resp: any = await request({
             request: {
-                url: `${serverDomainRequest.url}?appid=${appId}`,
-                method: serverDomainRequest.method,
+                url: `${miniProgramDomainRequest.url}?appid=${appId}`,
+                method: miniProgramDomainRequest.method,
             },
             data: {
                 action: "get",
             },
         });
         if (resp.code === 0) {
-            MessagePlugin.success(resp.data);
-            setCurrentDomain(resp.data);
+            MessagePlugin.info("获取成功");
+            setCurrentMiniProgramDomain(resp.data);
         }
         setLoading(false);
     };
 
-    const syncDomain = async () => {
-        if (!currentDomain) {
+    const getPlatformDomain = async () => {
+        setLoading(true);
+        const resp: any = await request({
+            request: platformDomainRequest,
+            data: {
+                action: "set",
+            },
+        });
+        if (resp.code === 0) {
+            MessagePlugin.success("获取成功");
+            setCurrentPlatformDomain(resp.data);
+        } else {
+            MessagePlugin.error(resp.errmsg);
+        }
+        setLoading(false);
+    };
+    const syncDomainToMiniProgram = async () => {
+        if (!currentPlatformDomain) {
             MessagePlugin.error("请先获取当前服务器域名");
             return;
         }
         setLoading(true);
-        const resp = await request({
+        const resp: any = await request({
             request: {
-                url: `${serverDomainRequest.url}?appid=${appId}`,
-                method: serverDomainRequest.method,
+                url: `${miniProgramDomainRequest.url}?appid=${appId}`,
+                method: miniProgramDomainRequest.method,
             },
             data: {
-                ...currentDomain,
-                ...{
-                    action: "set",
-                },
+                action: "set",
+                downloaddomain: currentPlatformDomain.downloaddomain,
+                requestdomain: currentPlatformDomain.testing_wxa_server_domain,
+                tcpdomain: [],
+                udpdomain: [],
+                uploaddomain: currentPlatformDomain.testing_wxa_server_domain,
+                wsrequestdomain: [],
             },
         });
         if (resp.code === 0) {
             MessagePlugin.success(resp.data);
+        } else {
+            MessagePlugin.error(resp.errmsg);
         }
         setLoading(false);
     };
@@ -653,6 +688,9 @@ export default function MiniProgramVersion() {
                     <Dropdown
                         options={experienceOptions}
                         onClick={onClickExpOptions}
+                        placement="bottom-left"
+                        maxColumnWidth={200}
+                        minColumnWidth={100}
                     >
                         <Button
                             style={{
@@ -661,6 +699,7 @@ export default function MiniProgramVersion() {
                                 marginRight: "40px",
                             }}
                             theme="primary"
+                            size="medium"
                         >
                             操作
                             <Icon

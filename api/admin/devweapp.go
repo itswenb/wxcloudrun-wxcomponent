@@ -160,7 +160,7 @@ type categoryList struct {
 	CategoryList []category `json:"categoryList" wx:"category_list"`
 }
 
-type syncDomainReq struct {
+type personalDomainType struct {
 	Action          string   `json:"action" binding:"required" wx:"action"`
 	RequestDomain   []string `json:"requestdomain" wx:"requestdomain"`
 	WsRequestDomain []string `json:"wsrequestdomain" wx:"wsrequestdomain"`
@@ -168,6 +168,24 @@ type syncDomainReq struct {
 	DownloadDomain  []string `json:"downloaddomain" wx:"downloaddomain"`
 	UdpDomain       []string `json:"udpdomain" wx:"udpdomain"`
 	TcpDomain       []string `json:"tcpdomain" wx:"tcpdomain"`
+}
+
+// action	string	是	操作类型。可选值请看下文
+// wxa_server_domain	string	否	最多可以添加1000个服务器域名，以;隔开。注意：域名不需带有http:// 等协议内容，也不能在域名末尾附加详细的 URI 地址，严格按照类似 www.qq.com 的写法。
+// is_modify_published_together	boolean	否	是否同时修改“全网发布版本的值”。（false：只改“测试版”；true：同时改“测试版”和“全网发布版”）省略时，默认为false。
+type platformDomainReq struct {
+	Action          string   `json:"action" binding:"required" wx:"action"`
+	WxaServerDomain []string `json:"wxa_server_domain" wx:"wxa_server_domain"`
+	IsModify        bool     `json:"is_modify_published_together" wx:"is_modify_published_together"`
+}
+
+// published_wxa_server_domain	string	目前生效的 “全网发布版”第三方平台“小程序服务器域名”。如果修改失败，该字段不会返回。如果没有已发布的第三方平台，该字段也不会返回。
+// testing_wxa_server_domain	string	目前生效的 “测试版”第三方平台“小程序服务器域名”。如果修改失败，该字段不会返回
+// invalid_wxa_server_domain	string	未通过验证的域名。如果不存在未通过验证的域名，该字段不会返回。
+type platformDomainResp struct {
+	PublishedWxaServerDomain string `json:"published_wxa_server_domain" wx:"published_wxa_server_domain"`
+	TestingWxaServerDomain   string `json:"testing_wxa_server_domain" wx:"testing_wxa_server_domain"`
+	InvalidWxaServerDomain   string `json:"invalid_wxa_server_domain" wx:"invalid_wxa_server_domain"`
 }
 
 func submitAudit(appid string, req *submitAuditReq) (int, error) {
@@ -580,20 +598,42 @@ func getQRCodeHandler(c *gin.Context) {
 
 func modifyDomainHandler(c *gin.Context) {
 	appid := c.DefaultQuery("appid", "")
-	var req syncDomainReq
+	var req personalDomainType
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	}
-	// 通过PostWxJsonWithAuthToken，请求之后拿到返回，再将返回的json解析出来，最后返回给前端
 	_, body, err := wx.PostWxJsonWithAuthToken(appid, "/wxa/modify_domain", "", req)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
-	var resp syncDomainReq
+	var resp personalDomainType
+	if err := wx.WxJson.Unmarshal(body, &resp); err != nil {
+		log.Errorf("Unmarshal err, %v", err)
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, errno.OK.WithData(resp))
+}
+
+// POST https://api.weixin.qq.com/cgi-bin/component/modify_wxa_server_domain?access_token=ACCESS_TOKEN
+func modifyThirdPlatformHandler(c *gin.Context) {
+	var req platformDomainReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
+		return
+	}
+	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/component/modify_wxa_server_domain", "", req)
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	var resp platformDomainReq
 	if err := wx.WxJson.Unmarshal(body, &resp); err != nil {
 		log.Errorf("Unmarshal err, %v", err)
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))

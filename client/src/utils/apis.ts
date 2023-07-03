@@ -159,7 +159,11 @@ export const refreshAuthorizedListRequest: IRequestMsg = {
     url: `${HOST}/admin/pull-authorizer-list`, // 获取当前域名
     method: "post",
 };
-export const serverDomainRequest: IRequestMsg = {
+export const miniProgramDomainRequest: IRequestMsg = {
     url: `${HOST}/admin/modify-domain`, // 获取当前域名
+    method: "post",
+};
+export const platformDomainRequest: IRequestMsg = {
+    url: `${HOST}/admin/platform-domain`, // 获取当前域名
     method: "post",
 };
