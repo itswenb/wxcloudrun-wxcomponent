@@ -161,13 +161,13 @@ type categoryList struct {
 }
 
 type syncDomainReq struct {
-	Action          string   `json:"action"`
-	RequestDomain   []string `json:"requestdomain"`
-	WsRequestDomain []string `json:"wsrequestdomain"`
-	UploadDomain    []string `json:"uploaddomain"`
-	DownloadDomain  []string `json:"downloaddomain"`
-	UdpDomain       []string `json:"udpdomain"`
-	TcpDomain       []string `json:"tcpdomain"`
+	Action          string   `json:"action" binding:"required" wx:"action"`
+	RequestDomain   []string `json:"requestdomain" wx:"requestdomain"`
+	WsRequestDomain []string `json:"wsrequestdomain" wx:"wsrequestdomain"`
+	UploadDomain    []string `json:"uploaddomain" wx:"uploaddomain"`
+	DownloadDomain  []string `json:"downloaddomain" wx:"downloaddomain"`
+	UdpDomain       []string `json:"udpdomain" wx:"udpdomain"`
+	TcpDomain       []string `json:"tcpdomain" wx:"tcpdomain"`
 }
 
 func submitAudit(appid string, req *submitAuditReq) (int, error) {
@@ -581,7 +581,6 @@ func getQRCodeHandler(c *gin.Context) {
 func modifyDomainHandler(c *gin.Context) {
 	appid := c.DefaultQuery("appid", "")
 	var req syncDomainReq
-	// 如果action是set，webviewdomain字段必填, 如果是get，webviewdomain字段不填
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))

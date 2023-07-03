@@ -18,7 +18,7 @@ import { truncate } from "lodash";
 import { request } from "../../../utils/axios";
 import {
     commitCodeRequest,
-    getCurrentDomainRequest,
+    serverDomainRequest,
     getDevVersionRequest,
     getTemplateListRequest,
     releaseCodeRequest,
@@ -254,33 +254,42 @@ export default function MiniProgramVersion() {
         }
     };
 
+    const [currentDomain, setCurrentDomain] = useState<any[] | undefined>();
+
     const getCurrentDomain = async () => {
         setLoading(true);
         const resp = await request({
-            request: getCurrentDomainRequest,
+            request: {
+                url: `${serverDomainRequest.url}?appid=${appId}`,
+                method: serverDomainRequest.method,
+            },
             data: {
-                appid: appId,
                 action: "get",
-                requestdomain: [],
-                wsrequestdomain: [],
-                uploaddomain: [],
-                downloaddomain: [],
-                udpdomain: [],
-                tcpdomain: [],
             },
         });
         if (resp.code === 0) {
             MessagePlugin.success(resp.data);
+            setCurrentDomain(resp.data);
         }
         setLoading(false);
     };
 
     const syncDomain = async () => {
+        if (!currentDomain) {
+            MessagePlugin.error("请先获取当前服务器域名");
+            return;
+        }
         setLoading(true);
         const resp = await request({
-            request: getCurrentDomainRequest,
+            request: {
+                url: `${serverDomainRequest.url}?appid=${appId}`,
+                method: serverDomainRequest.method,
+            },
             data: {
-                appid: appId,
+                ...currentDomain,
+                ...{
+                    action: "set",
+                },
             },
         });
         if (resp.code === 0) {

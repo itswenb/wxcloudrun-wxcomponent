@@ -156,7 +156,7 @@ export const uploadFileRequest: IRequestMsg = {
     method: "post",
 };
 
-export const getCurrentDomainRequest: IRequestMsg = {
+export const serverDomainRequest: IRequestMsg = {
     url: `${HOST}/admin/modify-domain`, // 获取当前域名
     method: "post",
 };
