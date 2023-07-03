@@ -293,7 +293,7 @@ export default function MiniProgramVersion() {
         const resp: any = await request({
             request: platformDomainRequest,
             data: {
-                action: "set",
+                action: "get",
             },
         });
         if (resp.code === 0) {
