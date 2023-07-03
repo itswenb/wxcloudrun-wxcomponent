@@ -586,10 +586,18 @@ func modifyDomainHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	}
-	if _, _, err := wx.PostWxJsonWithAuthToken(appid, "/wxa/modify_domain", "", req); err != nil {
+	// 通过PostWxJsonWithAuthToken，请求之后拿到返回，再将返回的json解析出来，最后返回给前端
+	_, body, err := wx.PostWxJsonWithAuthToken(appid, "/wxa/modify_domain", "", req)
+	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
-	c.JSON(http.StatusOK, errno.OK)
+	var resp syncDomainReq
+	if err := wx.WxJson.Unmarshal(body, &resp); err != nil {
+		log.Errorf("Unmarshal err, %v", err)
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, errno.OK.WithData(resp))
 }

@@ -155,7 +155,10 @@ export const uploadFileRequest: IRequestMsg = {
     url: `${HOST}/admin/upload-media`, // 修改服务状态
     method: "post",
 };
-
+export const refreshAuthorizedListRequest: IRequestMsg = {
+    url: `${HOST}/admin/pull-authorizer-list`, // 获取当前域名
+    method: "post",
+};
 export const serverDomainRequest: IRequestMsg = {
     url: `${HOST}/admin/modify-domain`, // 获取当前域名
     method: "post",
