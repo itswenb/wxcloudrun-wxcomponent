@@ -11,10 +11,11 @@ import {
     Loading,
     Alert,
     MessagePlugin,
+    Tabs,
 } from "tdesign-react";
-import { Icon } from "tdesign-icons-react";
+import { Icon, RefreshIcon } from "tdesign-icons-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { truncate } from "lodash";
+import { get, truncate } from "lodash";
 import { request } from "../../../utils/axios";
 import {
     commitCodeRequest,
@@ -30,6 +31,7 @@ import {
 import { useSearchParams } from "react-router-dom";
 import moment from "moment";
 import { routes } from "../../../config/route";
+import TabPanel from "tdesign-react/es/tabs/TabPanel";
 
 const { FormItem } = Form;
 const { Option } = Select;
@@ -86,12 +88,46 @@ export default function MiniProgramVersion() {
         any[] | undefined
     >();
     const [currentPlatformDomain, setCurrentPlatformDomain] = useState<any>();
-
     const formRef = useRef() as any;
 
     const appId = useMemo(() => {
         return searchParams.get("appId");
     }, [searchParams]);
+
+    const [localExtJson, setLocalExtJson] = useState<string>();
+    const [visibleDomainManage, setVisibleDomainManage] = useState(false);
+
+    useEffect(() => {
+        if (visibleSubmitModal && appId) {
+            const oldExtJson = localStorage.getItem(`extJson_${appId}`);
+            oldExtJson && setLocalExtJson(oldExtJson);
+        } else {
+            setLocalExtJson(undefined);
+        }
+    }, [visibleSubmitModal]);
+
+    useEffect(() => {
+        if (
+            !localExtJson ||
+            !appId ||
+            !formRef.current ||
+            !visibleSubmitModal
+        ) {
+            return;
+        }
+        localStorage.setItem(`extJson_${appId}`, localExtJson);
+        formRef.current.setFieldsValue({
+            extJson: localExtJson,
+        });
+    }, [localExtJson]);
+
+    useEffect(() => {
+        if (!visibleDomainManage || !appId) {
+            return;
+        }
+        getCurrentDomain();
+        getPlatformDomain();
+    }, [visibleDomainManage]);
 
     // 审核版选项
     const auditOptions = useMemo(() => {
@@ -136,26 +172,18 @@ export default function MiniProgramVersion() {
     const experienceOptions = useMemo(() => {
         const arr = [
             {
-                content: "获取小程序服务器域名",
+                content: "服务器域名管理",
                 value: 1,
             },
             {
-                content: "获取三方平台服务器域名",
-                value: 2,
-            },
-            {
-                content: "同步三方域名至小程序",
-                value: 3,
-            },
-            {
                 content: "重新提交代码",
-                value: 4,
+                value: 2,
             },
         ];
         if (versionData.auditInfo?.status !== 2) {
             arr.push({
                 content: "提交审核",
-                value: 5,
+                value: 3,
             });
         }
         return arr;
@@ -244,25 +272,15 @@ export default function MiniProgramVersion() {
         switch (value) {
             case 1: {
                 // 获取当前服务器域名
-                getCurrentDomain();
+                setVisibleDomainManage(true);
                 break;
             }
             case 2: {
-                // 同步服务器域名
-                getPlatformDomain();
-                break;
-            }
-            case 3: {
-                // 同步服务器域名
-                syncDomainToMiniProgram();
-                break;
-            }
-            case 4: {
                 // 重新提交代码
                 setVisibleSubmitModal(true);
                 break;
             }
-            case 5: {
+            case 3: {
                 // 提交审核
                 window.location.href = `#${routes.submitAudit.path}?appId=${appId}`;
                 break;
@@ -282,7 +300,7 @@ export default function MiniProgramVersion() {
             },
         });
         if (resp.code === 0) {
-            MessagePlugin.info("获取成功");
+            MessagePlugin.success("小程序服务器域名获取成功");
             setCurrentMiniProgramDomain(resp.data);
         }
         setLoading(false);
@@ -297,7 +315,7 @@ export default function MiniProgramVersion() {
             },
         });
         if (resp.code === 0) {
-            MessagePlugin.success("获取成功");
+            MessagePlugin.success("三方平台服务器域名获取成功");
             setCurrentPlatformDomain(resp.data);
         } else {
             MessagePlugin.error(resp.errmsg);
@@ -306,10 +324,12 @@ export default function MiniProgramVersion() {
     };
     const syncDomainToMiniProgram = async () => {
         if (!currentPlatformDomain) {
-            MessagePlugin.error("请先获取当前服务器域名");
+            MessagePlugin.error("请先获取平台服务器域名");
             return;
         }
         setLoading(true);
+        const domains =
+            currentPlatformDomain.testing_wxa_server_domain.split(";");
         const resp: any = await request({
             request: {
                 url: `${miniProgramDomainRequest.url}?appid=${appId}`,
@@ -317,16 +337,16 @@ export default function MiniProgramVersion() {
             },
             data: {
                 action: "set",
-                downloaddomain: currentPlatformDomain.downloaddomain,
-                requestdomain: currentPlatformDomain.testing_wxa_server_domain,
+                downloaddomain: domains,
+                requestdomain: domains,
                 tcpdomain: [],
                 udpdomain: [],
-                uploaddomain: currentPlatformDomain.testing_wxa_server_domain,
+                uploaddomain: domains,
                 wsrequestdomain: [],
             },
         });
         if (resp.code === 0) {
-            MessagePlugin.success(resp.data);
+            MessagePlugin.success("同步成功");
         } else {
             MessagePlugin.error(resp.errmsg);
         }
@@ -383,7 +403,7 @@ export default function MiniProgramVersion() {
             },
         });
         if (resp.code === 0) {
-            MessagePlugin.success("提交发布成功");
+            MessagePlugin.success("体验版提交成功");
             getVersion();
             closeSubmitModal();
         }
@@ -844,7 +864,29 @@ export default function MiniProgramVersion() {
                             },
                         ]}
                     >
-                        <Textarea style={{ width: "300px" }} />
+                        <Textarea
+                            style={{ width: "300px" }}
+                            autosize={{ minRows: 8, maxRows: 18 }}
+                            onBlur={() => {
+                                // 格式化json, 并且按照appId本地存储
+                                const value =
+                                    formRef.current.getFieldValue("extJson");
+                                if (!value) {
+                                    return;
+                                }
+                                try {
+                                    setLocalExtJson(
+                                        JSON.stringify(
+                                            JSON.parse(value),
+                                            null,
+                                            4
+                                        )
+                                    );
+                                } catch (e) {
+                                    console.log(e);
+                                }
+                            }}
+                        />
                     </FormItem>
                     <div
                         className="t-form__controls"
@@ -900,6 +942,57 @@ export default function MiniProgramVersion() {
                         <Button onClick={closeSubmitModal}>取消</Button>
                     </FormItem>
                 </Form>
+            </Dialog>
+            <Dialog
+                visible={visibleDomainManage}
+                onClose={() => setVisibleDomainManage(false)}
+                confirmBtn={null}
+                width={1000}
+                cancelBtn={null}
+                header="服务器域名管理"
+            >
+                <div>
+                    <p className="desc">当前小程序服务器域名</p>
+                    <textarea
+                        style={{ minHeight: "300px", width: "100%" }}
+                        placeholder="请先获取"
+                        onChange={() => {}}
+                        value={JSON.stringify(
+                            currentMiniProgramDomain,
+                            null,
+                            4
+                        )}
+                    />
+                </div>
+                <div>
+                    <p className="desc">当前三方平台服务器域名列表</p>
+                    <textarea
+                        style={{ minHeight: "300px", width: "100%" }}
+                        placeholder="请先获取"
+                        onChange={() => {}}
+                        value={JSON.stringify(currentPlatformDomain, null, 4)}
+                    />
+                </div>
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                    }}
+                >
+                    <Button onClick={getCurrentDomain}>
+                        更新小程序服务器域名
+                        <RefreshIcon />
+                    </Button>
+                    <Button onClick={getPlatformDomain}>
+                        更新三方平台服务器域名
+                        <RefreshIcon />
+                    </Button>
+                    <Button onClick={syncDomainToMiniProgram}>
+                        更新至小程序
+                        <RefreshIcon />
+                    </Button>
+                </div>
             </Dialog>
 
             {/*<Drawer visible={visibleDrawer} onClose={() => setVisibleDrawer(false)} confirmBtn={<span />}*/}
