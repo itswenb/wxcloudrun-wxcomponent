@@ -167,3 +167,8 @@ export const platformDomainRequest: IRequestMsg = {
     url: `${HOST}/admin/platform-domain`, // 获取当前域名
     method: "post",
 };
+
+export const getCloudEnvListRequest: IRequestMsg = {
+    url: `${HOST}/admin/cloudenvs`, // 获取云开发环境列表
+    method: "get",
+};
