@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"sync"
@@ -695,14 +696,27 @@ func modifyThirdPlatformHandler(c *gin.Context) {
 
 func getDuplicateOfficialAccountRegisterMPURLHandler(c *gin.Context) {
 	appid := c.DefaultQuery("appid", "")
+	component_appid := wxbase.GetAppid()
 	redirect_uri := c.DefaultQuery("redirect_uri", "")
 	if appid == "" || appid == "undefined" || appid == "null" {
 		c.JSON(http.StatusOK, errno.ErrInvalidParam)
 		return
 	}
-	component_appid := wxbase.GetAppid()
-	url := fmt.Sprintf("https://mp.weixin.qq.com/cgi-bin/fastregisterauth?component_appid=%s&copy_wx_verify=1&appid=%s&redirect_uri=%s", component_appid, appid, redirect_uri)
-	c.JSON(http.StatusOK, errno.OK.WithData(url))
+	// 授权URL
+	baseUrl, err := url.Parse("https://mp.weixin.qq.com")
+	if err != nil {
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	baseUrl.Path += "cgi-bin/fastregisterauth"
+	params := url.Values{}
+	params.Add("component_appid", component_appid)
+	params.Add("copy_wx_verify", "1")
+	params.Add("appid", appid)
+	params.Add("redirect_uri", redirect_uri)
+	baseUrl.RawQuery = params.Encode()
+
+	c.JSON(http.StatusOK, errno.OK.WithData(baseUrl.String()))
 }
 
 type duplicateOfficialAccountRegisterMPReq struct {
