@@ -41,8 +41,7 @@ type cloudEnvItem struct {
 
 // POST https://api.weixin.qq.com/cgi-bin/component/modify_wxa_server_domain?access_token=ACCESS_TOKEN
 func getCloudEnvListHandler(c *gin.Context) {
-	// 获取 component_access_token
-	_, body, err := wx.PostWxJsonWithComponentToken("/componenttcb/describeenvs", "", "")
+	_, body, err := wx.PostWxJsonWithComponentTokenTokenKey("/componenttcb/describeenvs", "", "")
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))

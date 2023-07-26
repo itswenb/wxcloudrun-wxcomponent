@@ -25,7 +25,10 @@ var WxJson = jsoniter.Config{
 }.Froze()
 
 // GetComponentWxApiUrl 拼接微信开放平台的url，带第三方token
-func GetComponentWxApiUrl(path string, query string) (string, error) {
+func GetComponentWxApiUrl(path string, query string, tokenKey string) (string, error) {
+	if tokenKey == "" {
+		tokenKey = "component_access_token"
+	}
 	if len(query) > 0 {
 		query = "&" + query
 	}
@@ -47,8 +50,8 @@ func GetComponentWxApiUrl(path string, query string) (string, error) {
 			log.Error(err)
 			return "", err
 		}
-		return fmt.Sprintf("%s?component_access_token=%s%s",
-			url, token, query), nil
+		return fmt.Sprintf("%s?%s=%s%s",
+			url, tokenKey, token, query), nil
 	}
 	return fmt.Sprintf("%s?%s", url, query), nil
 }
@@ -133,7 +136,25 @@ func getWxApi(url string) (*WxCommError, []byte, error) {
 
 // PostWxJsonWithComponentToken 以第三方身份向微信开放平台发起post请求
 func PostWxJsonWithComponentToken(path string, query string, data interface{}) (*WxCommError, []byte, error) {
-	url, err := GetComponentWxApiUrl(path, query)
+	url, err := GetComponentWxApiUrl(path, query, "")
+	if err != nil {
+		return nil, []byte{}, err
+	}
+	return postWxJson(url, data)
+}
+
+// PostWxJsonWithComponentToken 以第三方身份向微信开放平台发起post请求
+func PostWxJsonWithComponentTokenTokenKey(path string, query string, data interface{}) (*WxCommError, []byte, error) {
+	url, err := GetComponentWxApiUrl(path, query, "access_token")
+	if err != nil {
+		return nil, []byte{}, err
+	}
+	return postWxJson(url, data)
+}
+
+// PostWxJsonWithComponentToken 以第三方身份向微信开放平台发起post请求
+func PostWxJsonWithComponentTokenWithTokenKey(path string, query string, data interface{}, token_key string) (*WxCommError, []byte, error) {
+	url, err := GetComponentWxApiUrl(path, query, "")
 	if err != nil {
 		return nil, []byte{}, err
 	}
@@ -156,7 +177,7 @@ func PostWxJsonWithoutToken(path string, query string, data interface{}) (*WxCom
 
 // GetWxApiWithComponentToken 以第三方身份向微信开放平台发起get请求
 func GetWxApiWithComponentToken(path string, query string) (*WxCommError, []byte, error) {
-	url, err := GetComponentWxApiUrl(path, query)
+	url, err := GetComponentWxApiUrl(path, query, "")
 	if err != nil {
 		return nil, []byte{}, err
 	}

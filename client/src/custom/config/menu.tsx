@@ -14,6 +14,7 @@ export const customMenuList: IMenuList = [
         icon: <Icon.CloudIcon />,
         item: [
             routes.duplicateOfficalAccountRegisterMP,
+            routes.exchangeAdmin,
             routes.fasterRegisterMP,
         ],
     },

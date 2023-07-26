@@ -754,3 +754,57 @@ func duplicateOfficialAccountRegisterMPHandler(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, errno.OK.WithData(resp))
 }
+
+func getExchangeMPAdminURLHandler(c *gin.Context) {
+	appid := c.DefaultQuery("appid", "")
+	component_appid := wxbase.GetAppid()
+	redirect_uri := c.DefaultQuery("redirect_uri", "")
+	if appid == "" || appid == "undefined" || appid == "null" {
+		c.JSON(http.StatusOK, errno.ErrInvalidParam)
+		return
+	}
+	// 授权URL
+	baseUrl, err := url.Parse("https://mp.weixin.qq.com")
+	if err != nil {
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	baseUrl.Path += "wxopen/componentrebindadmin"
+	params := url.Values{}
+	params.Add("component_appid", component_appid)
+	params.Add("appid", appid)
+	params.Add("redirect_uri", redirect_uri)
+	baseUrl.RawQuery = params.Encode()
+
+	c.JSON(http.StatusOK, errno.OK.WithData(baseUrl.String()))
+}
+
+type exchangeMPAdminReq struct {
+	TaskID string `json:"taskid" wx:"taskid"`
+}
+
+type exchangeMPAdminResp struct {
+	ErrorCode    int    `json:"errcode" wx:"errcode"`
+	ErrorMessage string `json:"errmsg" wx:"errmsg"`
+}
+
+func exchangeMPAdminHandler(c *gin.Context) {
+	var req exchangeMPAdminReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
+		return
+	}
+	_, body, err := wx.PostWxJsonWithComponentTokenTokenKey("/cgi-bin/account/componentrebindadmin", "", gin.H{"ticket": req.TaskID})
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(string(body)))
+		return
+	}
+	var resp exchangeMPAdminResp
+	if err := wx.WxJson.Unmarshal(body, &resp); err != nil {
+		log.Errorf("Unmarshal err, %v", err)
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(string(body)))
+		return
+	}
+	c.JSON(http.StatusOK, errno.OK.WithData(resp))
+}

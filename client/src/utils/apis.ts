@@ -174,10 +174,19 @@ export const getCloudEnvListRequest: IRequestMsg = {
 };
 
 export const getDuplicateOfficialAccountRegisterMPURLRequest: IRequestMsg = {
-    url: `${HOST}/admin/duplicateOARegisterMPURL`, // 获取云开发环境列表
+    url: `${HOST}/admin/duplicateOARegisterMPURL`,
     method: "get",
 };
 export const duplicateOfficialAccountRegisterMPRequest: IRequestMsg = {
-    url: `${HOST}/admin/duplicateOARegisterMP`, // 获取云开发环境列表
+    url: `${HOST}/admin/duplicateOARegisterMP`,
+    method: "post",
+};
+
+export const getExchangeMPAdminURLRequest: IRequestMsg = {
+    url: `${HOST}/admin/exchangeMPAdminURL`,
+    method: "get",
+};
+export const exchangeMPAdminURLRequest: IRequestMsg = {
+    url: `${HOST}/admin/exchangeMPAdmin`,
     method: "post",
 };
