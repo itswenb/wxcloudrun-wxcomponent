@@ -54,7 +54,8 @@ export default function DuplicateOfficalAccountRegisterMP() {
             request: getDuplicateOfficialAccountRegisterMPURLRequest,
             data: {
                 appid: officialAccountAppId,
-                redirect_uri: window.location.href,
+                // 需要 url encode
+                redirect_uri: encodeURIComponent(window.location.href),
             },
         });
         setLoading(false);
