@@ -120,13 +120,17 @@ export default function DuplicateOfficalAccountRegisterMP() {
                 <Button
                     type="button"
                     loading={loading}
-                    onClick={getRegisterURL}
+                    onClick={() => getRegisterURL()}
                 >
                     前往授权
                 </Button>
 
                 {ticket && (
-                    <Button type="button" loading={loading} onClick={register}>
+                    <Button
+                        type="button"
+                        loading={loading}
+                        onClick={() => register()}
+                    >
                         注册小程序
                     </Button>
                 )}

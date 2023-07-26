@@ -706,6 +706,10 @@ func getDuplicateOfficialAccountRegisterMPURLHandler(c *gin.Context) {
 }
 
 type duplicateOfficialAccountRegisterMPReq struct {
+	Ticket string `json:"ticket" wx:"ticket"`
+}
+
+type duplicateOfficialAccountRegisterMPResp struct {
 	ErrorCode         int    `json:"errcode" wx:"errcode"`
 	ErrorMessage      string `json:"errmsg" wx:"errmsg"`
 	Appid             string `json:"appid" wx:"appid"`
@@ -716,18 +720,18 @@ type duplicateOfficialAccountRegisterMPReq struct {
 
 // POST https://api.weixin.qq.com/cgi-bin/account/fastregister?access_token=ACCESS_TOKEN
 func duplicateOfficialAccountRegisterMPHandler(c *gin.Context) {
-	ticket := c.DefaultQuery("ticket", "")
-	if ticket == "" || ticket == "undefined" || ticket == "null" {
-		c.JSON(http.StatusOK, errno.ErrInvalidParam)
+	var req duplicateOfficialAccountRegisterMPReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	}
-	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/account/fastregister", "", gin.H{"ticket": ticket})
+	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/account/fastregister", "", req)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
-	var resp duplicateOfficialAccountRegisterMPReq
+	var resp duplicateOfficialAccountRegisterMPResp
 	if err := wx.WxJson.Unmarshal(body, &resp); err != nil {
 		log.Errorf("Unmarshal err, %v", err)
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
