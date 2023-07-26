@@ -707,6 +707,7 @@ func getDuplicateOfficialAccountRegisterMPURLHandler(c *gin.Context) {
 
 type duplicateOfficialAccountRegisterMPReq struct {
 	Ticket string `json:"ticket" wx:"ticket"`
+	Appid  string `json:"appid" wx:"appid"`
 }
 
 type duplicateOfficialAccountRegisterMPResp struct {
@@ -725,14 +726,7 @@ func duplicateOfficialAccountRegisterMPHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	}
-	// 获取 component_access_token
-	token, err := wx.GetComponentAccessToken()
-	if err != nil {
-		log.Error(err.Error())
-		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
-		return
-	}
-	_, body, err := wx.PostWxJsonWithoutToken(fmt.Sprintf("/cgi-bin/account/fastregister?access_token=%s", token), "", req)
+	_, body, err := wx.PostWxJsonWithAuthToken(req.Appid, "/cgi-bin/account/fastregister", "", gin.H{"ticket": req.Ticket})
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(string(body)))

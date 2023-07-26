@@ -74,6 +74,7 @@ export default function DuplicateOfficalAccountRegisterMP() {
             request: duplicateOfficialAccountRegisterMPRequest,
             data: {
                 ticket,
+                appid: officialAccountAppId,
             },
         });
         setLoading(false);
@@ -119,6 +120,7 @@ export default function DuplicateOfficalAccountRegisterMP() {
             >
                 <Button
                     type="button"
+                    disabled={!officialAccountAppId}
                     loading={loading}
                     onClick={() => getRegisterURL()}
                 >
@@ -128,6 +130,7 @@ export default function DuplicateOfficalAccountRegisterMP() {
                 {ticket && (
                     <Button
                         type="button"
+                        disabled={!officialAccountAppId}
                         loading={loading}
                         onClick={() => register()}
                     >
