@@ -725,16 +725,23 @@ func duplicateOfficialAccountRegisterMPHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	}
-	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/account/fastregister", "", req)
+	// 获取 component_access_token
+	token, err := wx.GetComponentAccessToken()
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
+	_, body, err := wx.PostWxJsonWithoutToken(fmt.Sprintf("/cgi-bin/account/fastregister?access_token=%s", token), "", req)
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(string(body)))
+		return
+	}
 	var resp duplicateOfficialAccountRegisterMPResp
 	if err := wx.WxJson.Unmarshal(body, &resp); err != nil {
 		log.Errorf("Unmarshal err, %v", err)
-		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(string(body)))
 		return
 	}
 	c.JSON(http.StatusOK, errno.OK.WithData(resp))
