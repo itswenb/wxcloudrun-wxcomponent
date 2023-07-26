@@ -9,4 +9,12 @@ export const customMenuList: IMenuList = [
         icon: <Icon.CloudIcon />,
         item: [routes.cloudDevelopment],
     },
+    {
+        label: "代注册小程序",
+        icon: <Icon.CloudIcon />,
+        item: [
+            routes.duplicateOfficalAccountRegisterMP,
+            routes.fasterRegisterMP,
+        ],
+    },
 ];

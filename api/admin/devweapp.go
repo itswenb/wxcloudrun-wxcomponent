@@ -13,6 +13,7 @@ import (
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/httputils"
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/log"
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/wx"
+	wxbase "github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/wx/base"
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/db/dao"
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/db/model"
 	"github.com/gin-gonic/gin"
@@ -684,6 +685,49 @@ func modifyThirdPlatformHandler(c *gin.Context) {
 		return
 	}
 	var resp platformDomainResp
+	if err := wx.WxJson.Unmarshal(body, &resp); err != nil {
+		log.Errorf("Unmarshal err, %v", err)
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, errno.OK.WithData(resp))
+}
+
+func getDuplicateOfficialAccountRegisterMPURLHandler(c *gin.Context) {
+	appid := c.DefaultQuery("appid", "")
+	redirect_uri := c.DefaultQuery("redirect_uri", "")
+	if appid == "" || appid == "undefined" || appid == "null" {
+		c.JSON(http.StatusOK, errno.ErrInvalidParam)
+		return
+	}
+	component_appid := wxbase.GetAppid()
+	url := fmt.Sprintf("https://mp.weixin.qq.com/cgi-bin/fastregisterauth?component_appid=%s&copy_wx_verify=1&appid=%s&redirect_uri=%s", component_appid, appid, redirect_uri)
+	c.JSON(http.StatusOK, errno.OK.WithData(url))
+}
+
+type duplicateOfficialAccountRegisterMPReq struct {
+	ErrorCode         int    `json:"errcode" wx:"errcode"`
+	ErrorMessage      string `json:"errmsg" wx:"errmsg"`
+	Appid             string `json:"appid" wx:"appid"`
+	AuthorizationCode string `json:"authorization_code" wx:"authorization_code"`
+	IsWxVerifySucc    string `json:"is_wx_verify_succ" wx:"is_wx_verify_succ"`
+	IsLinkSucc        string `json:"is_link_succ" wx:"is_link_succ"`
+}
+
+// POST https://api.weixin.qq.com/cgi-bin/account/fastregister?access_token=ACCESS_TOKEN
+func duplicateOfficialAccountRegisterMPHandler(c *gin.Context) {
+	ticket := c.DefaultQuery("ticket", "")
+	if ticket == "" || ticket == "undefined" || ticket == "null" {
+		c.JSON(http.StatusOK, errno.ErrInvalidParam)
+		return
+	}
+	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/account/fastregister", "", gin.H{"ticket": ticket})
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	var resp duplicateOfficialAccountRegisterMPReq
 	if err := wx.WxJson.Unmarshal(body, &resp); err != nil {
 		log.Errorf("Unmarshal err, %v", err)
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))

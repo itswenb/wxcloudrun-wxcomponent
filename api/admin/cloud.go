@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/errno"
@@ -43,14 +42,7 @@ type cloudEnvItem struct {
 // POST https://api.weixin.qq.com/cgi-bin/component/modify_wxa_server_domain?access_token=ACCESS_TOKEN
 func getCloudEnvListHandler(c *gin.Context) {
 	// 获取 component_access_token
-	token, err := wx.GetComponentAccessToken()
-	log.Errorf("getComponentAccessToken token, %s", token)
-	if err != nil {
-		log.Error(err.Error())
-		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
-		return
-	}
-	_, body, err := wx.PostWxJsonWithComponentToken(fmt.Sprintf("/componenttcb/describeenvs?access_token=%s", token), "", "")
+	_, body, err := wx.PostWxJsonWithComponentToken("/componenttcb/describeenvs", "", "")
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))

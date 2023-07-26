@@ -172,3 +172,12 @@ export const getCloudEnvListRequest: IRequestMsg = {
     url: `${HOST}/admin/cloudenvs`, // 获取云开发环境列表
     method: "get",
 };
+
+export const getDuplicateOfficialAccountRegisterMPURLRequest: IRequestMsg = {
+    url: `${HOST}/admin/duplicateOARegisterMPURL`, // 获取云开发环境列表
+    method: "get",
+};
+export const duplicateOfficialAccountRegisterMPRequest: IRequestMsg = {
+    url: `${HOST}/admin/duplicateOARegisterMP`, // 获取云开发环境列表
+    method: "post",
+};

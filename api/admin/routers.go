@@ -69,4 +69,8 @@ func Routers(e *gin.RouterGroup) {
 
 	// 云开发
 	g.GET("/cloudenvs", getCloudEnvListHandler)
+
+	// 代注册小程序
+	g.GET("/duplicateOARegisterMPURL", getDuplicateOfficialAccountRegisterMPURLHandler)
+	g.POST("/duplicateOARegisterMP", duplicateOfficialAccountRegisterMPHandler)
 }
