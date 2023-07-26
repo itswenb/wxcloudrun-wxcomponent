@@ -781,6 +781,7 @@ func getExchangeMPAdminURLHandler(c *gin.Context) {
 
 type exchangeMPAdminReq struct {
 	TaskID string `json:"taskid" wx:"taskid"`
+	Appid  string `json:"appid" wx:"appid"`
 }
 
 type exchangeMPAdminResp struct {
@@ -794,7 +795,7 @@ func exchangeMPAdminHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	}
-	_, body, err := wx.PostWxJsonWithComponentTokenTokenKey("/cgi-bin/account/componentrebindadmin", "", gin.H{"taskid": req.TaskID})
+	_, body, err := wx.PostWxJsonWithAuthToken(req.Appid, "/cgi-bin/account/componentrebindadmin", "", gin.H{"taskid": req.TaskID})
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(string(body)))

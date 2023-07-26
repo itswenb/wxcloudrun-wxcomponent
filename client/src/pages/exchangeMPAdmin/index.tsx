@@ -114,7 +114,7 @@ export default function ExchangeAdmin() {
                         loading={loading}
                         onClick={() => exchange()}
                     >
-                        提交表更
+                        提交变更
                     </Button>
                 )}
             </div>
