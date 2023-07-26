@@ -794,7 +794,7 @@ func exchangeMPAdminHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	}
-	_, body, err := wx.PostWxJsonWithComponentTokenTokenKey("/cgi-bin/account/componentrebindadmin", "", gin.H{"ticket": req.TaskID})
+	_, body, err := wx.PostWxJsonWithComponentTokenTokenKey("/cgi-bin/account/componentrebindadmin", "", gin.H{"taskid": req.TaskID})
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(string(body)))

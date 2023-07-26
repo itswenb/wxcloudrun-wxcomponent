@@ -26,7 +26,7 @@ var WxJson = jsoniter.Config{
 
 // GetComponentWxApiUrl 拼接微信开放平台的url，带第三方token
 func GetComponentWxApiUrl(path string, query string, tokenKey string) (string, error) {
-	if tokenKey == "" {
+	if len(tokenKey) <= 0 {
 		tokenKey = "component_access_token"
 	}
 	if len(query) > 0 {
@@ -146,15 +146,6 @@ func PostWxJsonWithComponentToken(path string, query string, data interface{}) (
 // PostWxJsonWithComponentToken 以第三方身份向微信开放平台发起post请求
 func PostWxJsonWithComponentTokenTokenKey(path string, query string, data interface{}) (*WxCommError, []byte, error) {
 	url, err := GetComponentWxApiUrl(path, query, "access_token")
-	if err != nil {
-		return nil, []byte{}, err
-	}
-	return postWxJson(url, data)
-}
-
-// PostWxJsonWithComponentToken 以第三方身份向微信开放平台发起post请求
-func PostWxJsonWithComponentTokenWithTokenKey(path string, query string, data interface{}, token_key string) (*WxCommError, []byte, error) {
-	url, err := GetComponentWxApiUrl(path, query, "")
 	if err != nil {
 		return nil, []byte{}, err
 	}
