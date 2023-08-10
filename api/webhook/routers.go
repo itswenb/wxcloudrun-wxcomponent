@@ -6,5 +6,5 @@ import (
 
 // Routers 路由
 func Routers(e *gin.Engine) {
-	e.POST("/webhook/audit/:appid", auditHandler)
+	e.POST("/webhook/audit", auditHandler)
 }
