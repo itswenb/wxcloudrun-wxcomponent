@@ -1,4 +1,4 @@
-package webhook
+package admin
 
 import (
 	"bytes"

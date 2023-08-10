@@ -10,6 +10,7 @@ import (
 func Routers(e *gin.RouterGroup) {
 	// auth
 	e.PUT("/auth", authHandler)
+	e.POST("/webhook/audit", auditHandler)
 
 	g := e.Group("/admin", middleware.JWTMiddleWare)
 
