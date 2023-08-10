@@ -1,4 +1,4 @@
-package wxcallback
+package webhook
 
 import (
 	"github.com/gin-gonic/gin"
