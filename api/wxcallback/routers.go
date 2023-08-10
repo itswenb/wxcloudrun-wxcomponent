@@ -10,4 +10,5 @@ func Routers(e *gin.Engine) {
 	g := e.Group("/wxcallback", middleware.WXSourceMiddleWare)
 	g.POST("/component", componentHandler)
 	g.POST("/biz/:appid", bizHandler)
+	g.POST("/audit/:appid", auditHandler)
 }

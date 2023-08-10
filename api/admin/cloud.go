@@ -9,24 +9,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// errcode	number	错误码
-// errmsg	string	错误信息
-// info_list	Array.<cloudEnvItem>	数据
+// appids	array<string>	是	要查询的appid
+// source_type	number	是	请求环境源，填 1，表示云托管环境
+type cloudEnvListReq struct {
+	Appids     []string `json:"appids" wx:"appids"`
+	SourceType int      `json:"source_type" wx:"source_type"`
+}
+
 type cloudEnvListResp struct {
 	ErrCode  int            `json:"errcode" wx:"errcode"`
 	ErrMsg   string         `json:"errmsg" wx:"errmsg"`
 	InfoList []cloudEnvItem `json:"info_list" wx:"info_list"`
 }
 
-// env	String	环境ID
-// alias	String	环境别名
-// create_time	String	创建时间
-// update_ime	String	最后修改时间
-// status	String	环境状态
-// package_id	String	tcb产品套餐ID
-// package_name	String	套餐中文名称
-// dbinstance_id	String	数据库示例ID
-// bucket_id	String	静态存储ID
 type cloudEnvItem struct {
 	Env          string `json:"env" wx:"env"`
 	Alias        string `json:"alias" wx:"alias"`
@@ -41,7 +36,13 @@ type cloudEnvItem struct {
 
 // POST https://api.weixin.qq.com/cgi-bin/component/modify_wxa_server_domain?access_token=ACCESS_TOKEN
 func getCloudEnvListHandler(c *gin.Context) {
-	_, body, err := wx.PostWxJsonWithComponentTokenTokenKey("/componenttcb/describeenvs", "", "")
+	var req cloudEnvListReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
+		return
+	}
+	_, body, err := wx.PostWxJsonWithComponentTokenTokenKey("/componenttcb/describeenvs", "", req)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))

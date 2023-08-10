@@ -91,3 +91,13 @@ func GetDevWeAppRecords(offset int, limit int, appid string) ([]*model.Authorize
 	result = result.Count(&count).Offset(offset).Limit(limit).Find(&records)
 	return records, count, result.Error
 }
+
+// GetAuthorizerByUserName 通过原始ID获取授权账号信息
+func GetAuthorizerByUserName(username string) ([]*model.Authorizer, error) {
+	cli := db.Get()
+	result := cli.Table(authorizerTableName)
+	// 查询 username, 不用计算count
+	var info []*model.Authorizer
+	result = result.Where("username = ?", username).Find(&info)
+	return info, result.Error
+}
