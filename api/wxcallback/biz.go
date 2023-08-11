@@ -1,6 +1,11 @@
 package wxcallback
 
 import (
+<<<<<<< HEAD
+=======
+	"bytes"
+	JSON "encoding/json"
+>>>>>>> 40e7226 (Change json merge)
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -45,6 +50,21 @@ func bizHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
+<<<<<<< HEAD
+=======
+	userInfo, err := dao.GetAuthorizerByUserName(json.ToUserName)
+	if err != nil {
+	} else {
+		if json.MsgType == "event" {
+			userinfoJson, userinfoErr := JSON.Marshal(userInfo)
+			bodyJSon, bodyErr := JSON.Marshal(r)
+			if userinfoErr != nil || bodyErr != nil {
+			} else {
+				http.Post(os.Getenv("WXCOMPONENT_CALLBACK_AUDIT_URL"), "application/json", bytes.NewReader(mergeJSON(userinfoJson, bodyJSon)))
+			}
+		}
+	}
+>>>>>>> 40e7226 (Change json merge)
 
 	// 转发到用户配置的地址
 	proxyOpen, err := proxyCallbackMsg("", json.MsgType, json.Event, string(body), c)
@@ -56,4 +76,27 @@ func bizHandler(c *gin.Context) {
 	if !proxyOpen {
 		c.String(http.StatusOK, "success")
 	}
+}
+
+func mergeJSON(json1, json2 []byte) []byte {
+	merged := make(map[string]interface{})
+	err := JSON.Unmarshal(json1, &merged)
+	if err != nil {
+		log.Error("解析 JSON1 失败:", err)
+		return nil
+	}
+
+	err = JSON.Unmarshal(json2, &merged)
+	if err != nil {
+		log.Error("解析 JSON2 失败:", err)
+		return nil
+	}
+
+	result, err := JSON.Marshal(merged)
+	if err != nil {
+		log.Error("转换合并后的 JSON 失败:", err)
+		return nil
+	}
+
+	return result
 }
