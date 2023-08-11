@@ -47,4 +47,4 @@ ENV GIN_MODE release
 
 # 执行启动命令
 # CMD ["/wxcloudrun-wxcomponent/main"]
-CMD ["/bin/bash", './start.sh']
+CMD ["/bin/sh", './start.sh']
