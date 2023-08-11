@@ -6,12 +6,16 @@ client/node_modules
 client/.pnp
 client.pnp.js
 client/.idea
-
+webhookServer/node_modules
+webhookServer/.pnp
+webhookServer.pnp.js
+webhookServer/.idea
 # testing
 client/coverage
-
+webhookServer/coverage
 # production
 client/build
+webhookServer/build
 
 # misc
 client/.DS_Store
@@ -19,6 +23,11 @@ client/.env.local
 client/.env.development.local
 client/.env.test.local
 client/.env.production.local
+webhookServer/.DS_Store
+webhookServer/.env.local
+webhookServer/.env.development.local
+webhookServer/.env.test.local
+webhookServer/.env.production.local
 
 client/npm-debug.log*
 client/yarn-debug.log*
@@ -27,3 +36,10 @@ client/yarn.lock
 client/package-lock.json
 client/.vscode
 client/dist
+webhookServer/npm-debug.log*
+webhookServer/yarn-debug.log*
+webhookServer/yarn-error.log*
+webhookServer/yarn.lock
+webhookServer/package-lock.json
+webhookServer/.vscode
+webhookServer/dist

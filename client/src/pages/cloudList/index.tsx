@@ -4,7 +4,10 @@ import { Alert, List } from "tdesign-react";
 import ListItemMeta from "tdesign-react/es/list/ListItemMeta";
 import { useEffect, useState } from "react";
 import { request } from "../../utils/axios";
-import { getCloudEnvListRequest } from "../../utils/apis";
+import {
+    getAuthorizedAccountRequest,
+    getCloudEnvListRequest,
+} from "../../utils/apis";
 
 // {
 //         "env": "test2-4a89da",
@@ -28,22 +31,45 @@ interface EnvType {
     dbinstance_id: string;
     bucket_id: string;
 }
-
+const pageSize = 10;
 export default function CloudList() {
+    const [currentPage, setCurrentPage] = useState(1);
+    const [accountList, setAccountList] = useState([]);
+    const [accountTotal, setAccountTotal] = useState(0);
+
     const [envList, setEnvList] = useState<EnvType[]>([]);
 
     useEffect(() => {
-        getEnvList();
+        getAccountList();
     }, []);
 
     const getEnvList = async () => {
         const resp: any = await request({
             request: getCloudEnvListRequest,
-            noNeedCheckLogin: true,
+            data: {
+                appid: [accountList.map((item: any) => item.appid)],
+                source_type: 0,
+            },
         });
         if (resp.code === 0) {
             console.log("response:", resp);
             setEnvList(resp.data);
+        }
+    };
+
+    const getAccountList = async () => {
+        const resp: any = await request({
+            request: getAuthorizedAccountRequest,
+            data: {
+                offset: (currentPage - 1) * pageSize,
+                limit: pageSize,
+            },
+        });
+        console.log("getAccountList resp: ", resp);
+
+        if (resp.code === 0) {
+            setAccountList(resp.data.records);
+            setAccountTotal(resp.data.total);
         }
     };
 
