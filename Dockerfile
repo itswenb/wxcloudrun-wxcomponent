@@ -6,6 +6,7 @@ WORKDIR /wxcloudrun-wxcomponent
 COPY . /wxcloudrun-wxcomponent/
 
 RUN cd /wxcloudrun-wxcomponent/client && npm install --registry=https://registry.npm.taobao.org && npm run build
+RUN cd /wxcloudrun-wxcomponent/webhookServer && npm install --registry=https://registry.npm.taobao.org
 
 FROM golang:1.17.1-alpine3.14 as builder
 

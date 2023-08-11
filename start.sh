@@ -1,6 +1,6 @@
 #!/bin/bash
-# Start the server
-cd ./webhookServer
-yarn start
+
+# 开启 webhook 服务
+cd ./webhookServer && yarn start && cd ../
 
 /wxcloudrun-wxcomponent/main
