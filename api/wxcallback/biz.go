@@ -1,13 +1,11 @@
 package wxcallback
 
 import (
-<<<<<<< HEAD
-=======
 	"bytes"
 	JSON "encoding/json"
->>>>>>> 40e7226 (Change json merge)
 	"io/ioutil"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/errno"
@@ -50,21 +48,16 @@ func bizHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
-<<<<<<< HEAD
-=======
 	userInfo, err := dao.GetAuthorizerByUserName(json.ToUserName)
 	if err != nil {
+		log.Error(err)
 	} else {
-		if json.MsgType == "event" {
-			userinfoJson, userinfoErr := JSON.Marshal(userInfo)
-			bodyJSon, bodyErr := JSON.Marshal(r)
-			if userinfoErr != nil || bodyErr != nil {
-			} else {
-				http.Post(os.Getenv("WXCOMPONENT_CALLBACK_AUDIT_URL"), "application/json", bytes.NewReader(mergeJSON(userinfoJson, bodyJSon)))
-			}
+		combinedInfo, combinedInfoErr := JSON.Marshal(gin.H{"appInfo": userInfo, "body": string(body)})
+		if combinedInfoErr != nil {
+		} else {
+			http.Post(os.Getenv("WXCOMPONENT_CALLBACK_AUDIT_URL"), "application/json", bytes.NewReader(combinedInfo))
 		}
 	}
->>>>>>> 40e7226 (Change json merge)
 
 	// 转发到用户配置的地址
 	proxyOpen, err := proxyCallbackMsg("", json.MsgType, json.Event, string(body), c)
