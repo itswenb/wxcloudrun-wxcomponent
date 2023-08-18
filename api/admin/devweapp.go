@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -644,7 +645,13 @@ func getQRCodeHandler(c *gin.Context) {
 // 配置小程序服务器域名 action 可传入 get set
 func modifyServerDomainHandler(c *gin.Context) {
 	appid := c.DefaultQuery("appid", "")
-	_, body, err := wx.PostWxJsonWithAuthToken(appid, "/wxa/modify_domain", "", c.Request.Body)
+	requestParams, err := getOriginalRequest(c.Request.Body)
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	_, body, err := wx.PostWxJsonWithAuthToken(appid, "/wxa/modify_domain", "", requestParams)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
@@ -656,8 +663,13 @@ func modifyServerDomainHandler(c *gin.Context) {
 // 配置小程序业务域名 action 可传入 get set
 func modifyBusinessDomainHandler(c *gin.Context) {
 	appid := c.DefaultQuery("appid", "")
-	// 直接获取请求body
-	_, body, err := wx.PostWxJsonWithAuthToken(appid, "/wxa/setwebviewdomain", "", c.Request.Body)
+	requestParams, err := getOriginalRequest(c.Request.Body)
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	_, body, err := wx.PostWxJsonWithAuthToken(appid, "/wxa/setwebviewdomain", "", requestParams)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
@@ -668,8 +680,13 @@ func modifyBusinessDomainHandler(c *gin.Context) {
 }
 
 func getPlatformBusinessDomainConfirmFileHandler(c *gin.Context) {
-	// 直接获取请求body,当成请求参数
-	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/component/get_domain_confirmfile", "", c.Request.Body)
+	requestParams, err := getOriginalRequest(c.Request.Body)
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/component/get_domain_confirmfile", "", requestParams)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
@@ -681,7 +698,13 @@ func getPlatformBusinessDomainConfirmFileHandler(c *gin.Context) {
 
 // POST https://api.weixin.qq.com/cgi-bin/component/modify_wxa_server_domain?access_token=ACCESS_TOKEN
 func modifyPlatformServerDomainHandler(c *gin.Context) {
-	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/component/modify_wxa_server_domain", "", c.Request.Body)
+	requestParams, err := getOriginalRequest(c.Request.Body)
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/component/modify_wxa_server_domain", "", requestParams)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
@@ -692,7 +715,13 @@ func modifyPlatformServerDomainHandler(c *gin.Context) {
 
 // POST https://api.weixin.qq.com/cgi-bin/component/modify_wxa_server_domain?access_token=ACCESS_TOKEN
 func modifyPlatformBusinessDomainHandler(c *gin.Context) {
-	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/component/modify_wxa_jump_domain", "", c.Request.Body)
+	requestParams, err := getOriginalRequest(c.Request.Body)
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/component/modify_wxa_jump_domain", "", requestParams)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
@@ -815,4 +844,17 @@ func exchangeMPAdminHandler(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, errno.OK.WithData(resp))
+}
+
+func getOriginalRequest(body io.ReadCloser) (interface{}, error) {
+	originalBody, err := io.ReadAll(body)
+	if err != nil {
+		return nil, err
+	}
+	var requestData interface{}
+	err = wx.WxJson.Unmarshal(originalBody, &requestData)
+	if err != nil {
+		return nil, err
+	}
+	return requestData, nil
 }
