@@ -44,8 +44,7 @@ export default function ServiceDomainManage() {
 
   useEffect(() => {
     setEditingPlatformServerDomain(
-      currentPlatformServerDomain &&
-        JSON.stringify(JSON.parse(currentPlatformServerDomain), null, 2)
+      JSON.stringify(currentPlatformServerDomain, null, 2)
     );
   }, [currentPlatformServerDomain]);
 
@@ -71,10 +70,9 @@ export default function ServiceDomainManage() {
     useState<any>();
 
   useEffect(() => {
-    currentPlatformBusinessDomain &&
-      setEditingPlatformBusinessDomain(
-        JSON.stringify(JSON.parse(currentPlatformBusinessDomain), null, 2)
-      );
+    setEditingPlatformBusinessDomain(
+      JSON.stringify(currentPlatformBusinessDomain, null, 2)
+    );
   }, [currentPlatformBusinessDomain]);
 
   const [invalidPlatformBusinessDomain, setInvalidPlatformBusinessDomain] =
@@ -115,7 +113,7 @@ export default function ServiceDomainManage() {
     });
     if (resp.code === 0) {
       MessagePlugin.success("小程序业务域名获取成功");
-      setCurrentMiniProgramBusinessDomain(resp.data);
+      setCurrentMiniProgramBusinessDomain(JSON.parse(resp.data));
     }
   };
 
@@ -128,7 +126,7 @@ export default function ServiceDomainManage() {
     });
     if (resp.code === 0) {
       MessagePlugin.success("三方平台服务器域名获取成功");
-      setCurrentPlatformServerDomain(resp.data);
+      setCurrentPlatformServerDomain(JSON.parse(resp.data));
     } else {
       MessagePlugin.error(resp.errmsg);
     }
@@ -142,7 +140,7 @@ export default function ServiceDomainManage() {
     });
     if (resp.code === 0) {
       MessagePlugin.success("三方平台业务域名获取成功");
-      setCurrentPlatformBusinessDomain(resp.data);
+      setCurrentPlatformBusinessDomain(JSON.parse(resp.data));
     } else {
       MessagePlugin.error(resp.errmsg);
     }
@@ -154,14 +152,13 @@ export default function ServiceDomainManage() {
       data: {
         action: "set",
         is_modify_published_together: true,
-        wxa_server_domain: editingPlatformServerDomain
-          ? JSON.parse(editingPlatformServerDomain).published_wxa_server_domain
-          : undefined,
+        wxa_server_domain:
+          editingPlatformServerDomain.testing_wxa_server_domain,
       },
     });
     if (resp.code === 0) {
       MessagePlugin.success("三方平台服务器域名更新成功");
-      setCurrentPlatformServerDomain(resp.data);
+      setCurrentPlatformServerDomain(JSON.parse(resp.data));
     } else {
       MessagePlugin.error(resp.errmsg);
     }
@@ -173,10 +170,8 @@ export default function ServiceDomainManage() {
       data: {
         action: "set",
         is_modify_published_together: true,
-        wxa_jump_h5_domain: editingPlatformBusinessDomain
-          ? JSON.parse(editingPlatformBusinessDomain)
-              .published_wxa_jump_h5_domain
-          : undefined,
+        wxa_jump_h5_domain:
+          editingPlatformBusinessDomain.testing_wxa_jump_h5_domain,
       },
     });
     if (resp.code === 0) {
@@ -246,12 +241,14 @@ export default function ServiceDomainManage() {
       data: {},
     });
     if (resp.code === 0) {
-      MessagePlugin.success("下载成功");
-      const url = window.URL.createObjectURL(
-        new Blob([resp.data], { type: "application/json" })
-      );
-      const link = document.createElement("a");
-      link.style.display = "none";
+      const file = JSON.parse(resp.data);
+      const blob = new Blob([file.file_content], {
+        type: "text/plain;charset=utf-8",
+      });
+      const a = document.createElement("a");
+      a.href = window.URL.createObjectURL(blob);
+      a.download = file.file_name;
+      a.click();
     } else {
       MessagePlugin.error(resp.errmsg);
     }
@@ -282,14 +279,8 @@ export default function ServiceDomainManage() {
                 type="button"
                 shape="round"
                 disabled={
-                  !currentPlatformServerDomain ||
-                  (currentPlatformServerDomain &&
-                    editingPlatformServerDomain ===
-                      JSON.stringify(
-                        JSON.parse(currentPlatformServerDomain),
-                        null,
-                        2
-                      ))
+                  editingPlatformServerDomain ===
+                  JSON.stringify(currentPlatformServerDomain, null, 2)
                 }
                 style={{ marginLeft: "10px" }}
                 onClick={updatePlatformServerDomain}
@@ -336,15 +327,7 @@ export default function ServiceDomainManage() {
               disabled
               placeholder="请先获取"
               onChange={() => {}}
-              value={
-                currentMiniProgramServerDomain
-                  ? JSON.stringify(
-                      JSON.parse(currentMiniProgramServerDomain),
-                      null,
-                      2
-                    )
-                  : ""
-              }
+              value={JSON.stringify(currentMiniProgramServerDomain, null, 2)}
             />
           </div>
           <div
@@ -389,14 +372,8 @@ export default function ServiceDomainManage() {
                 type="button"
                 shape="round"
                 disabled={
-                  !currentPlatformBusinessDomain ||
-                  (currentPlatformBusinessDomain &&
-                    editingPlatformBusinessDomain ===
-                      JSON.stringify(
-                        JSON.parse(currentPlatformBusinessDomain),
-                        null,
-                        2
-                      ))
+                  editingPlatformBusinessDomain ===
+                  JSON.stringify(currentPlatformBusinessDomain, null, 2)
                 }
                 style={{ marginLeft: "10px" }}
                 onClick={updatePlatformBusinessDomain}
@@ -451,15 +428,7 @@ export default function ServiceDomainManage() {
               disabled
               placeholder="请先获取"
               onChange={() => {}}
-              value={
-                currentMiniProgramBusinessDomain
-                  ? JSON.stringify(
-                      JSON.parse(currentMiniProgramBusinessDomain),
-                      null,
-                      2
-                    )
-                  : ""
-              }
+              value={JSON.stringify(currentMiniProgramBusinessDomain, null, 2)}
             />
           </div>
           <div

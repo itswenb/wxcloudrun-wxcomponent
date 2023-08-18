@@ -254,3 +254,20 @@ export const request = async (params: IAxiosParams1, errHandle?: IErrHandle): Pr
         }
     }
 }
+
+// 用于某些接口返回的是微信API直接返回的结果，需要解析
+export const decodeDataRequest = async (params: IAxiosParams1, errHandle?: IErrHandle) => {
+    return new Promise<void>((resolve, reject) => {
+        request(params, errHandle).then((res: any) => {
+            if (res.code === 0) {
+                resolve(JSON.parse(res.data))
+            } else {
+                reject(res)
+            }
+        }
+        ).catch((err) => {
+            reject(err)
+        }
+        )
+    })
+}
