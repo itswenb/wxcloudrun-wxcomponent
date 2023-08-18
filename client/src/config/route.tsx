@@ -16,95 +16,102 @@ import ProxyConfig from "../pages/proxyConfig";
 import RedirectPage from "../pages/redirectPage";
 import MiniProgramVersion from "../pages/authorizedAccountManage/miniProgramVersion";
 import SubmitAudit from "../pages/authorizedAccountManage/submitAudit";
+import ServiceDomainManage from "../pages/authorizedAccountManage/serviceDomain";
 
 export const routes: IRoute = {
-    home: {
-        label: '首页',
-        path: '/home',
-        element: <Home />,
-    },
-    authorizedAccountManage: {
-        label: '授权帐号管理',
-        path: '/authorizedAccountManage',
-        element: <AuthorizedAccountManage />
-    },
-    authPageManage: {
-        label: '授权链接生成器',
-        path: '/authPageManage',
-        element: <AuthPageManage />
-    },
-    passwordManage: {
-        label: 'Secret与密码管理',
-        path: '/passwordManage',
-        element: <PasswordManage />
-    },
-    systemVersion: {
-        label: '系统版本',
-        path: '/systemVersion',
-        element: <SystemVersion />
-    },
-    login: {
-        label: '登录',
-        path: '/login',
-        element: <Login />,
-        dontNeedMenu: true
-    },
-    authorize: {
-        label: '授权页',
-        path: '/authorize',
-        dontNeedMenu: true,
-        element: <AuthPage />
-    },
-    authorizeH5: {
-        label: '授权页H5',
-        path: '/authorizeH5',
-        dontNeedMenu: true,
-        element: <AuthPageH5 />
-    },
-    developTools: {
-        label: '开发调试',
-        path: '/developTools',
-        element: <DevelopTools />
-    },
-    thirdToken: {
-        label: '第三方 Token',
-        path: '/developTools/token',
-        showPath: '/developTools',
-        element: <ThirdToken />
-    },
-    thirdMessage: {
-        label: '第三方消息查看',
-        path: '/developTools/message',
-        showPath: '/developTools',
-        element: <ThirdMessage />
-    },
-    forwardMessage: {
-        label: '消息转发器',
-        path: '/forwardMessage',
-        element: <ForwardMessage />
-    },
-    proxyConfig: {
-        label: 'proxy 配置',
-        path: '/proxyConfig',
-        element: <ProxyConfig />
-    },
-    redirectPage: {
-        label: '授权回调跳转页',
-        path: '/redirectPage',
-        dontNeedMenu: true,
-        element: <RedirectPage />
-    },
-    miniProgramVersion: {
-        label: '版本管理',
-        path: '/authorizedAccountManage/miniProgramVersion',
-        showPath: '/authorizedAccountManage',
-        element: <MiniProgramVersion />
-    },
-    submitAudit: {
-        label: '提交审核',
-        path: '/authorizedAccountManage/submitAudit',
-        showPath: '/authorizedAccountManage',
-        element: <SubmitAudit />
-    },
-    ...customRoute
-}
+  home: {
+    label: "首页",
+    path: "/home",
+    element: <Home />,
+  },
+  authorizedAccountManage: {
+    label: "授权帐号管理",
+    path: "/authorizedAccountManage",
+    element: <AuthorizedAccountManage />,
+  },
+  authPageManage: {
+    label: "授权链接生成器",
+    path: "/authPageManage",
+    element: <AuthPageManage />,
+  },
+  passwordManage: {
+    label: "Secret与密码管理",
+    path: "/passwordManage",
+    element: <PasswordManage />,
+  },
+  systemVersion: {
+    label: "系统版本",
+    path: "/systemVersion",
+    element: <SystemVersion />,
+  },
+  login: {
+    label: "登录",
+    path: "/login",
+    element: <Login />,
+    dontNeedMenu: true,
+  },
+  authorize: {
+    label: "授权页",
+    path: "/authorize",
+    dontNeedMenu: true,
+    element: <AuthPage />,
+  },
+  authorizeH5: {
+    label: "授权页H5",
+    path: "/authorizeH5",
+    dontNeedMenu: true,
+    element: <AuthPageH5 />,
+  },
+  developTools: {
+    label: "开发调试",
+    path: "/developTools",
+    element: <DevelopTools />,
+  },
+  thirdToken: {
+    label: "第三方 Token",
+    path: "/developTools/token",
+    showPath: "/developTools",
+    element: <ThirdToken />,
+  },
+  thirdMessage: {
+    label: "第三方消息查看",
+    path: "/developTools/message",
+    showPath: "/developTools",
+    element: <ThirdMessage />,
+  },
+  forwardMessage: {
+    label: "消息转发器",
+    path: "/forwardMessage",
+    element: <ForwardMessage />,
+  },
+  proxyConfig: {
+    label: "proxy 配置",
+    path: "/proxyConfig",
+    element: <ProxyConfig />,
+  },
+  redirectPage: {
+    label: "授权回调跳转页",
+    path: "/redirectPage",
+    dontNeedMenu: true,
+    element: <RedirectPage />,
+  },
+  miniProgramVersion: {
+    label: "版本管理",
+    path: "/authorizedAccountManage/miniProgramVersion",
+    showPath: "/authorizedAccountManage",
+    element: <MiniProgramVersion />,
+  },
+  serviceDomainManage: {
+    label: "服务器域名管理",
+    path: "/authorizedAccountManage/serviceDomainManage",
+    showPath: "/authorizedAccountManage",
+    element: <ServiceDomainManage />,
+  },
+  submitAudit: {
+    label: "提交审核",
+    path: "/authorizedAccountManage/submitAudit",
+    showPath: "/authorizedAccountManage",
+    element: <SubmitAudit />,
+  },
+  ...customRoute,
+};

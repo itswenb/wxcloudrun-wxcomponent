@@ -641,57 +641,64 @@ func getQRCodeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, errno.OK.WithData(gin.H{"releaseQrCode": base64Image}))
 }
 
-func modifyDomainHandler(c *gin.Context) {
+// 配置小程序服务器域名 action 可传入 get set
+func modifyServerDomainHandler(c *gin.Context) {
 	appid := c.DefaultQuery("appid", "")
-	var req personalDomainReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		log.Error(err.Error())
-		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
-		return
-	}
-	_, body, err := wx.PostWxJsonWithAuthToken(appid, "/wxa/modify_domain", "", req)
+	_, body, err := wx.PostWxJsonWithAuthToken(appid, "/wxa/modify_domain", "", c.Request.Body)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
-	var resp personalDomainResp
-	if err := wx.WxJson.Unmarshal(body, &resp); err != nil {
-		log.Errorf("Unmarshal err, %v", err)
+	c.JSON(http.StatusOK, errno.OK.WithData(string(body)))
+}
+
+// 配置小程序业务域名 action 可传入 get set
+func modifyBusinessDomainHandler(c *gin.Context) {
+	appid := c.DefaultQuery("appid", "")
+	// 直接获取请求body
+	_, body, err := wx.PostWxJsonWithAuthToken(appid, "/wxa/setwebviewdomain", "", c.Request.Body)
+	if err != nil {
+		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
-	c.JSON(http.StatusOK, errno.OK.WithData(resp))
+	// 将请求body返回
+	c.JSON(http.StatusOK, errno.OK.WithData(string(body)))
+}
+
+func getPlatformBusinessDomainConfirmFileHandler(c *gin.Context) {
+	// 直接获取请求body,当成请求参数
+	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/component/get_domain_confirmfile", "", c.Request.Body)
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	// 将请求body以json形式返回
+	c.JSON(http.StatusOK, errno.OK.WithData(string(body)))
 }
 
 // POST https://api.weixin.qq.com/cgi-bin/component/modify_wxa_server_domain?access_token=ACCESS_TOKEN
-func modifyThirdPlatformHandler(c *gin.Context) {
-	var req platformDomainReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		log.Error(err.Error())
-		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
-		return
-	}
-	// 获取 component_access_token
-	token, err := wx.GetComponentAccessToken()
+func modifyPlatformServerDomainHandler(c *gin.Context) {
+	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/component/modify_wxa_server_domain", "", c.Request.Body)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
-	_, body, err := wx.PostWxJsonWithoutToken(fmt.Sprintf("/cgi-bin/component/modify_wxa_server_domain?access_token=%s", token), "", req)
+	c.JSON(http.StatusOK, errno.OK.WithData(string(body)))
+}
+
+// POST https://api.weixin.qq.com/cgi-bin/component/modify_wxa_server_domain?access_token=ACCESS_TOKEN
+func modifyPlatformBusinessDomainHandler(c *gin.Context) {
+	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/component/modify_wxa_jump_domain", "", c.Request.Body)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
-	var resp platformDomainResp
-	if err := wx.WxJson.Unmarshal(body, &resp); err != nil {
-		log.Errorf("Unmarshal err, %v", err)
-		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
-		return
-	}
-	c.JSON(http.StatusOK, errno.OK.WithData(resp))
+	c.JSON(http.StatusOK, errno.OK.WithData(string(body)))
 }
 
 func getDuplicateOfficialAccountRegisterMPURLHandler(c *gin.Context) {

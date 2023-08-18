@@ -49,8 +49,15 @@ func Routers(e *gin.RouterGroup) {
 	g.GET("/page-list", getPageListHandler)
 	g.GET("/category", getCategoryHandler)
 	g.GET("/qrcode", getQRCodeHandler)
-	g.POST("/modify-domain", modifyDomainHandler)
-	g.POST("/platform-domain", modifyThirdPlatformHandler)
+
+	// 代开发小程序 服务器域名管理
+	g.POST("/server-domain", modifyServerDomainHandler)
+	g.POST("/platform-server-domain", modifyPlatformServerDomainHandler)
+
+	// 代开发小程序 业务域名管理
+	g.POST("/business-domain", modifyBusinessDomainHandler)
+	g.POST("/platform-business-domain", modifyPlatformBusinessDomainHandler)
+	g.POST("/platform-business-domain-confirm-file", getPlatformBusinessDomainConfirmFileHandler)
 
 	// 设置
 	g.POST("/secret", setWxSecretHandler)

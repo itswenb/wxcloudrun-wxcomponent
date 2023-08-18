@@ -159,12 +159,34 @@ export const refreshAuthorizedListRequest: IRequestMsg = {
     url: `${HOST}/admin/pull-authorizer-list`, // 获取当前域名
     method: "post",
 };
-export const miniProgramDomainRequest: IRequestMsg = {
-    url: `${HOST}/admin/modify-domain`, // 获取当前域名
+
+// 获取小程序服务器域名
+export const miniProgramServerDomainRequest: IRequestMsg = {
+    url: `${HOST}/admin/server-domain`,
     method: "post",
 };
-export const platformDomainRequest: IRequestMsg = {
-    url: `${HOST}/admin/platform-domain`, // 获取当前域名
+
+// 获取三方平台服务器域名
+export const platformServerDomainRequest: IRequestMsg = {
+    url: `${HOST}/admin/platform-server-domain`, // 获取当前域名
+    method: "post",
+};
+
+// 获取小程序业务域名
+export const miniProgramBusinessDomainRequest: IRequestMsg = {
+    url: `${HOST}/admin/business-domain`, // 获取当前域名
+    method: "post",
+};
+
+// 获取三方平台业务域名
+export const platformBusinessDomainRequest: IRequestMsg = {
+    url: `${HOST}/admin/platform-business-domain`, // 获取当前域名
+    method: "post",
+};
+
+// 获取三方平台业务域名验证文件
+export const getPlatformBusinessDomainConfirmFileRequest: IRequestMsg = {
+    url: `${HOST}/admin/platform-business-domain-confirm-file`, // 获取当前域名
     method: "post",
 };
 

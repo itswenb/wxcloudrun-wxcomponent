@@ -215,7 +215,7 @@ export const deleteRequest = async (params: IAxiosParams, errHandle?: IErrHandle
     return data
 }
 
-export const request = async (params: IAxiosParams1, errHandle?: IErrHandle) => {
+export const request = async (params: IAxiosParams1, errHandle?: IErrHandle): Promise<any> => {
     if (!params.noNeedCheckLogin) {
         if (!checkLogin()) {
             return noLoginError
