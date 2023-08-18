@@ -216,7 +216,7 @@ export default function ServiceDomainManage() {
       return;
     }
     const domains =
-      currentPlatformBusinessDomain.published_wxa_jump_h5_domain.split(";");
+      currentPlatformBusinessDomain.testing_wxa_jump_h5_domain.split(";");
     const resp: any = await request({
       request: {
         url: `${miniProgramBusinessDomainRequest.url}?appid=${appId}`,
