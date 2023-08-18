@@ -686,7 +686,7 @@ func getPlatformBusinessDomainConfirmFileHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
-	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/component/get_domain_confirmfile", "", requestParams)
+	_, body, err := wx.PostWxJsonWithComponentTokenTokenKey("/cgi-bin/component/get_domain_confirmfile", "", requestParams)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
@@ -704,7 +704,7 @@ func modifyPlatformServerDomainHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
-	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/component/modify_wxa_server_domain", "", requestParams)
+	_, body, err := wx.PostWxJsonWithComponentTokenTokenKey("/cgi-bin/component/modify_wxa_server_domain", "", requestParams)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
@@ -721,7 +721,7 @@ func modifyPlatformBusinessDomainHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
-	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/component/modify_wxa_jump_domain", "", requestParams)
+	_, body, err := wx.PostWxJsonWithComponentTokenTokenKey("/cgi-bin/component/modify_wxa_jump_domain", "", requestParams)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
