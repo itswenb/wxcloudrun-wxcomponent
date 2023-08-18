@@ -44,7 +44,7 @@ export default function ServiceDomainManage() {
 
   useEffect(() => {
     setEditingPlatformServerDomain(
-      JSON.stringify(currentPlatformServerDomain, null, 4)
+      JSON.stringify(JSON.parse(currentPlatformServerDomain), null, 2)
     );
   }, [currentPlatformServerDomain]);
 
@@ -71,7 +71,7 @@ export default function ServiceDomainManage() {
 
   useEffect(() => {
     setEditingPlatformBusinessDomain(
-      JSON.stringify(currentPlatformBusinessDomain, null, 4)
+      JSON.stringify(JSON.parse(currentPlatformBusinessDomain), null, 2)
     );
   }, [currentPlatformBusinessDomain]);
 
@@ -278,7 +278,11 @@ export default function ServiceDomainManage() {
                 shape="round"
                 disabled={
                   editingPlatformServerDomain ===
-                  JSON.stringify(currentPlatformServerDomain, null, 4)
+                  JSON.stringify(
+                    JSON.parse(currentPlatformServerDomain),
+                    null,
+                    2
+                  )
                 }
                 style={{ marginLeft: "10px" }}
                 onClick={updatePlatformServerDomain}
@@ -325,7 +329,11 @@ export default function ServiceDomainManage() {
               disabled
               placeholder="请先获取"
               onChange={() => {}}
-              value={JSON.stringify(currentMiniProgramServerDomain, null, 4)}
+              value={JSON.stringify(
+                JSON.parse(currentMiniProgramServerDomain),
+                null,
+                2
+              )}
             />
           </div>
           <div
@@ -371,7 +379,11 @@ export default function ServiceDomainManage() {
                 shape="round"
                 disabled={
                   editingPlatformBusinessDomain ===
-                  JSON.stringify(currentPlatformBusinessDomain, null, 4)
+                  JSON.stringify(
+                    JSON.parse(currentPlatformBusinessDomain),
+                    null,
+                    2
+                  )
                 }
                 style={{ marginLeft: "10px" }}
                 onClick={updatePlatformBusinessDomain}
@@ -426,7 +438,11 @@ export default function ServiceDomainManage() {
               disabled
               placeholder="请先获取"
               onChange={() => {}}
-              value={JSON.stringify(currentMiniProgramBusinessDomain, null, 4)}
+              value={JSON.stringify(
+                JSON.parse(currentMiniProgramBusinessDomain),
+                null,
+                2
+              )}
             />
           </div>
           <div
