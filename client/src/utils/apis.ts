@@ -212,3 +212,13 @@ export const exchangeMPAdminURLRequest: IRequestMsg = {
     url: `${HOST}/admin/exchangeMPAdmin`,
     method: "post",
 };
+
+export const fastRegisterMPRequest: IRequestMsg = {
+    url: `${HOST}/admin/fasterRegister`,
+    method: "post",
+};
+
+export const fastRegisterMPStatusRequest: IRequestMsg = {
+    url: `${HOST}/admin/fasterRegisterStatus`,
+    method: "post",
+};

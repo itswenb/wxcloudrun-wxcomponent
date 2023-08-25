@@ -846,6 +846,38 @@ func exchangeMPAdminHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, errno.OK.WithData(resp))
 }
 
+func fastRegisterWeAppHandler(c *gin.Context) {
+	requestParams, err := getOriginalRequest(c.Request.Body)
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	_, body, err := wx.PostWxJsonWithComponentTokenTokenKey("/cgi-bin/account/fastregisterweapp", "action=create", requestParams)
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, errno.OK.WithData(string(body)))
+}
+
+func queryFastRegisterWeAppHandler(c *gin.Context) {
+	requestParams, err := getOriginalRequest(c.Request.Body)
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	_, body, err := wx.PostWxJsonWithComponentTokenTokenKey("/cgi-bin/account/fastregisterweapp", "action=search", requestParams)
+	if err != nil {
+		log.Error(err.Error())
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, errno.OK.WithData(string(body)))
+}
+
 func getOriginalRequest(body io.ReadCloser) (interface{}, error) {
 	originalBody, err := io.ReadAll(body)
 	if err != nil {

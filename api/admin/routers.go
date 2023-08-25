@@ -81,6 +81,8 @@ func Routers(e *gin.RouterGroup) {
 	// 代注册小程序
 	g.GET("/duplicateOARegisterMPURL", getDuplicateOfficialAccountRegisterMPURLHandler)
 	g.POST("/duplicateOARegisterMP", duplicateOfficialAccountRegisterMPHandler)
+	g.POST("/fasterRegister", fastRegisterWeAppHandler)
+	g.POST("/fasterRegisterStatus", queryFastRegisterWeAppHandler)
 
 	// 小程序管理
 	g.GET("/exchangeMPAdminURL", getExchangeMPAdminURLHandler)

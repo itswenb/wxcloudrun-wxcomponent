@@ -148,9 +148,10 @@ export default function DuplicateOfficalAccountRegisterMP() {
         <p>
           3、管理员扫码验证通过后跳转至第三方平台页面，微信将注册结果返回给第三方平台。
         </p>
+        <p>4、注册成功之后在小程序助手中添加登录邮箱，即可登陆公众平台。</p>
       </div>
       <Divider />
-      <p className="text">待复制公众号：</p>
+      <p className="text">选择公众号：</p>
       <Select
         onChange={(e) => {
           e && setOfficialAccountAppId(e as string);
