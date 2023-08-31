@@ -720,6 +720,7 @@ export default function MiniProgramVersion() {
             name="extJson"
             style={{ marginBottom: 0 }}
             label="ext.json配置(ext_json)"
+            initialData={localStorage.getItem(`extJson_${appId}`) || ""}
             rules={[
               {
                 required: true,
@@ -730,7 +731,7 @@ export default function MiniProgramVersion() {
           >
             <Textarea
               style={{ width: "300px" }}
-              autosize={{ minRows: 8, maxRows: 18 }}
+              // autosize={{ minRows: 18, maxRows: 18 }}
               onBlur={() => {
                 // 格式化json, 并且按照appId本地存储
                 const value = formRef.current.getFieldValue("extJson");
@@ -739,6 +740,10 @@ export default function MiniProgramVersion() {
                 }
                 try {
                   setLocalExtJson(JSON.stringify(JSON.parse(value), null, 4));
+                  localStorage.setItem(
+                    `extJson_${appId}`,
+                    JSON.stringify(JSON.parse(value), null, 4)
+                  );
                 } catch (e) {
                   console.log(e);
                 }

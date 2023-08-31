@@ -98,7 +98,7 @@ export default function ServiceDomainManage() {
     });
     if (resp.code === 0) {
       MessagePlugin.success("小程序服务器域名获取成功");
-      setCurrentMiniProgramServerDomain(resp.data);
+      setCurrentMiniProgramServerDomain(JSON.parse(resp.data));
     }
   };
   const getCurrentMiniProgramBusinessDomain = async () => {
@@ -188,7 +188,18 @@ export default function ServiceDomainManage() {
       return;
     }
     const domains =
-      currentPlatformServerDomain.testing_wxa_server_domain.split(";");
+      currentPlatformServerDomain.testing_wxa_server_domain
+        ?.split(";")
+        .filter((item: any) => item !== "") || [];
+    if (
+      domains.length === 0 ||
+      domains.every((item: string) =>
+        currentMiniProgramServerDomain.requestdomain?.includes(item)
+      )
+    ) {
+      MessagePlugin.error("无需同步");
+      return;
+    }
     const resp: any = await request({
       request: {
         url: `${miniProgramServerDomainRequest.url}?appid=${appId}`,
@@ -206,6 +217,7 @@ export default function ServiceDomainManage() {
     });
     if (resp.code === 0) {
       MessagePlugin.success("同步成功");
+      getCurrentMiniProgramServerDomain();
     } else {
       MessagePlugin.error(resp.errmsg);
     }
@@ -216,7 +228,18 @@ export default function ServiceDomainManage() {
       return;
     }
     const domains =
-      currentPlatformBusinessDomain.testing_wxa_jump_h5_domain.split(";");
+      currentPlatformBusinessDomain?.testing_wxa_jump_h5_domain
+        .split(";")
+        .filter((item: any) => item !== "") || [];
+    if (
+      domains.length === 0 ||
+      domains.every((item: string) =>
+        currentMiniProgramBusinessDomain.webviewdomain?.includes(item)
+      )
+    ) {
+      MessagePlugin.error("无需同步");
+      return;
+    }
     const resp: any = await request({
       request: {
         url: `${miniProgramBusinessDomainRequest.url}?appid=${appId}`,
@@ -229,12 +252,13 @@ export default function ServiceDomainManage() {
     });
     if (resp.code === 0) {
       MessagePlugin.success("同步成功");
+      getCurrentMiniProgramBusinessDomain();
     } else {
       MessagePlugin.error(resp.errmsg);
     }
   };
 
-  const downloadFlatformBusinessDomainConfirmFile = async () => {
+  const downloadPlatformBusinessDomainConfirmFile = async () => {
     // 下载文件
     const resp: any = await request({
       request: getPlatformBusinessDomainConfirmFileRequest,
@@ -384,7 +408,7 @@ export default function ServiceDomainManage() {
                 type="button"
                 shape="round"
                 style={{ marginLeft: "10px" }}
-                onClick={downloadFlatformBusinessDomainConfirmFile}
+                onClick={downloadPlatformBusinessDomainConfirmFile}
               >
                 下载域名验证文件
               </Button>
