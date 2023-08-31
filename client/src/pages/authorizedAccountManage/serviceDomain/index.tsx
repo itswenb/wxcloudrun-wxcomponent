@@ -254,6 +254,7 @@ export default function ServiceDomainManage() {
       MessagePlugin.success("同步成功");
       getCurrentMiniProgramBusinessDomain();
     } else {
+      MessagePlugin.error("请确认当前同步的业务域名是否已经添加至服务器域名");
       MessagePlugin.error(resp.errmsg);
     }
   };

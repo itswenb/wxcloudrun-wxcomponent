@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -14,6 +13,7 @@ import (
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/errno"
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/httputils"
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/log"
+	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/utils"
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/wx"
 	wxbase "github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/wx/base"
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/db/dao"
@@ -645,7 +645,7 @@ func getQRCodeHandler(c *gin.Context) {
 // 配置小程序服务器域名 action 可传入 get set
 func modifyServerDomainHandler(c *gin.Context) {
 	appid := c.DefaultQuery("appid", "")
-	requestParams, err := getOriginalRequest(c.Request.Body)
+	requestParams, err := utils.GetOriginalRequest(c.Request.Body)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
@@ -663,7 +663,7 @@ func modifyServerDomainHandler(c *gin.Context) {
 // 配置小程序业务域名 action 可传入 get set
 func modifyBusinessDomainHandler(c *gin.Context) {
 	appid := c.DefaultQuery("appid", "")
-	requestParams, err := getOriginalRequest(c.Request.Body)
+	requestParams, err := utils.GetOriginalRequest(c.Request.Body)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
@@ -680,7 +680,7 @@ func modifyBusinessDomainHandler(c *gin.Context) {
 }
 
 func getPlatformBusinessDomainConfirmFileHandler(c *gin.Context) {
-	requestParams, err := getOriginalRequest(c.Request.Body)
+	requestParams, err := utils.GetOriginalRequest(c.Request.Body)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
@@ -698,7 +698,7 @@ func getPlatformBusinessDomainConfirmFileHandler(c *gin.Context) {
 
 // POST https://api.weixin.qq.com/cgi-bin/component/modify_wxa_server_domain?access_token=ACCESS_TOKEN
 func modifyPlatformServerDomainHandler(c *gin.Context) {
-	requestParams, err := getOriginalRequest(c.Request.Body)
+	requestParams, err := utils.GetOriginalRequest(c.Request.Body)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
@@ -715,7 +715,7 @@ func modifyPlatformServerDomainHandler(c *gin.Context) {
 
 // POST https://api.weixin.qq.com/cgi-bin/component/modify_wxa_server_domain?access_token=ACCESS_TOKEN
 func modifyPlatformBusinessDomainHandler(c *gin.Context) {
-	requestParams, err := getOriginalRequest(c.Request.Body)
+	requestParams, err := utils.GetOriginalRequest(c.Request.Body)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
@@ -847,7 +847,7 @@ func exchangeMPAdminHandler(c *gin.Context) {
 }
 
 func fastRegisterWeAppHandler(c *gin.Context) {
-	requestParams, err := getOriginalRequest(c.Request.Body)
+	requestParams, err := utils.GetOriginalRequest(c.Request.Body)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
@@ -863,7 +863,7 @@ func fastRegisterWeAppHandler(c *gin.Context) {
 }
 
 func queryFastRegisterWeAppHandler(c *gin.Context) {
-	requestParams, err := getOriginalRequest(c.Request.Body)
+	requestParams, err := utils.GetOriginalRequest(c.Request.Body)
 	if err != nil {
 		log.Error(err.Error())
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
@@ -876,17 +876,4 @@ func queryFastRegisterWeAppHandler(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, errno.OK.WithData(string(body)))
-}
-
-func getOriginalRequest(body io.ReadCloser) (interface{}, error) {
-	originalBody, err := io.ReadAll(body)
-	if err != nil {
-		return nil, err
-	}
-	var requestData interface{}
-	err = wx.WxJson.Unmarshal(originalBody, &requestData)
-	if err != nil {
-		return nil, err
-	}
-	return requestData, nil
 }
