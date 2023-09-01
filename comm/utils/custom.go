@@ -9,13 +9,13 @@ import (
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/wx"
 )
 
-var notificationUrl string
+var NotificationUrl string
 
 func Init() error {
-	notificationUrl = os.Getenv("WXCOMPONENT_CALLBACK_NOTIFICATION_URL")
-	if notificationUrl == "" {
-		log.Error("notificationUrl is empty")
-		return errors.New("notificationUrl is empty")
+	NotificationUrl = os.Getenv("WXCOMPONENT_CALLBACK_NOTIFICATION_URL")
+	if NotificationUrl == "" {
+		log.Error("NotificationUrl is empty")
+		return errors.New("NotificationUrl is empty")
 	}
 	return nil
 }
