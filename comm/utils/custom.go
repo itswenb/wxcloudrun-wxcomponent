@@ -10,12 +10,18 @@ import (
 )
 
 var NotificationUrl string
+var AuditNotificationUrl string
 
 func Init() error {
 	NotificationUrl = os.Getenv("WXCOMPONENT_CALLBACK_NOTIFICATION_URL")
 	if NotificationUrl == "" {
 		log.Error("NotificationUrl is empty")
 		return errors.New("NotificationUrl is empty")
+	}
+	AuditNotificationUrl = os.Getenv("WXCOMPONENT_CALLBACK_AUDIT_URL")
+	if AuditNotificationUrl == "" {
+		log.Error("AuditNotificationUrl is empty")
+		return errors.New("AuditNotificationUrl is empty")
 	}
 	return nil
 }
