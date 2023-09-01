@@ -2,7 +2,6 @@ package custom
 
 import (
 	"net/http"
-	"os"
 
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/errno"
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/httputils"
@@ -18,13 +17,17 @@ func notificationHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
 		return
 	}
-	notificationUrl := os.Getenv("WXCOMPONENT_CALLBACK_NOTIFICATION_URL")
-	if notificationUrl == "" {
+	if utils.notificationUrl == "" {
 		log.Error("notificationUrl is empty")
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData("notificationUrl is empty"))
 		return
 	}
-	resp, err := httputils.PostJson(notificationUrl, requestParams)
+	resp, err := httputils.PostJson(utils.notificationUrl, gin.H{
+		msgtype: "markdown",
+		markdown: gin.H{
+			"content": string(requestParams),
+		},
+	})
 	if err != nil {
 		log.Error(err)
 		c.JSON(http.StatusOK, errno.ErrRequestErr.WithData(err.Error()))
