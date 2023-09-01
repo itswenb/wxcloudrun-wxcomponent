@@ -4,6 +4,7 @@ import (
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/api/admin"
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/api/proxy"
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/log"
+	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/utils"
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/db"
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/db/dao"
 )
@@ -20,7 +21,7 @@ func include(opts ...AppOption) {
 func Init() error {
 
 	// db.Init must be the first
-	include(db.Init, dao.Init, admin.Init, proxy.Init)
+	include(db.Init, dao.Init, admin.Init, proxy.Init, utils.Init)
 
 	for i, opt := range appOpts {
 		log.Infof("[%d]--begin init--", i)
